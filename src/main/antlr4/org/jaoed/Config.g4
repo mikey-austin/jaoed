@@ -43,7 +43,7 @@ list_value
     ;
 
 section
-    : section_type NAME* '{' EOL (statement EOL)* '}'
+    : section_type '{' EOL (statement EOL)* '}'
     ;
 
 section_type
@@ -76,11 +76,7 @@ BOOLEAN
     ;
 
 COMMENT
-    : '/*' .*? '*/' -> skip
-    ;
-
-LINE_COMMENT
-    : '//' ~[\r\n]* -> skip
+    : '#' ~[\r\n]* -> skip
     ;
 
 STRING
