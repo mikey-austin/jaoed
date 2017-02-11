@@ -18,16 +18,16 @@ statement
     ;
 
 assignment
-    : assignmentName '=' NUMBER
-    | assignmentName '=' STRING
-    | assignmentName '=' BOOLEAN
-    | assignmentName '=' list
-    | assignmentName '=' NAME
+    : assignmentName '=' INTEGER # intVal
+    | assignmentName '=' STRING  # strVal
+    | assignmentName '=' BOOLEAN # boolVal
+    | assignmentName '=' list    # listVal
+    | assignmentName '=' SYMBOL  # symVal
     ;
 
 assignmentName
-    : NAME
-    | sectionType
+    : SYMBOL
+    | ('device' | 'interface' | 'access-list' | 'logger')
     ;
 
 list
@@ -36,39 +36,35 @@ list
     ;
 
 listStatements
-    : listValue (',' EOL* listValue)*
+    : listEntry (',' EOL* listEntry)*
     ;
 
-listValue
-    : NUMBER
-    | STRING
-    | BOOLEAN
+listEntry
+    : INTEGER # intEntry
+    | STRING  # strEntry
+    | BOOLEAN # boolEntry
     ;
 
 section
-    : sectionType '{' EOL* sectionStatements EOL* '}'
+    : 'logger' '{' sectionStatements '}'      # loggerSection
+    | 'interface' '{' sectionStatements '}'   # interfaceSection
+    | 'device' '{' sectionStatements '}'      # deviceSection
+    | 'access-list' '{' sectionStatements '}' # aclSection
     ;
 
 sectionStatements
-    : assignment (EOL* assignment)*
-    ;
-
-sectionType
-    : 'logger'
-    | 'interface'
-    | 'device'
-    | 'access-list'
+    : EOL* assignment (EOL* assignment)* EOL*
     ;
 
 //
 // Token definitions.
 //
 
-NUMBER
-    : '-'?([0-9]+'.')*[0-9]+
+INTEGER
+    : '-'?[0-9]+
     ;
 
-NAME
+SYMBOL
     : [a-zA-Z0-9_-]+
     ;
 
