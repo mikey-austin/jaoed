@@ -4,52 +4,58 @@
 grammar Config;
 
 config
-    : (statement EOL)*
+    : statements EOL* EOF
+    ;
+
+statements
+    : statement (EOL* statement)*
     ;
 
 statement
     : assignment
     | section
+    | EOL
     ;
 
 assignment
-    : NAME '=' NUMBER
-    | NAME '=' STRING
-    | NAME '=' BOOLEAN
-    | NAME '=' list
+    : assignmentName '=' NUMBER
+    | assignmentName '=' STRING
+    | assignmentName '=' BOOLEAN
+    | assignmentName '=' list
+    | assignmentName '=' NAME
+    ;
+
+assignmentName
+    : NAME
+    | sectionType
     ;
 
 list
-    : '[' list_statements ']'
-    | '[' list_statements EOL ']'
-    | '[' EOL list_statements ']'
-    | '[' EOL list_statements EOL ']'
+    : '[' ']'
+    | '[' EOL* listStatements EOL* ']'
     ;
 
-list_statements
-    : list_value list_values
+listStatements
+    : listValue (',' EOL* listValue)*
     ;
 
-list_values
-    : ',' EOL list_value list_values
-    | ',' list_value list_values
-    |
-    ;
-
-list_value
+listValue
     : NUMBER
     | STRING
     | BOOLEAN
     ;
 
 section
-    : section_type '{' EOL (statement EOL)* '}'
+    : sectionType '{' EOL* sectionStatements EOL* '}'
     ;
 
-section_type
-    : 'logging'
+sectionStatements
+    : assignment (EOL* assignment)*
+    ;
+
+sectionType
+    : 'logger'
     | 'interface'
-    | 'default'
     | 'device'
     | 'access-list'
     ;
@@ -58,16 +64,12 @@ section_type
 // Token definitions.
 //
 
-EOL
-    : [\r\n]+
-    ;
-
 NUMBER
     : '-'?([0-9]+'.')*[0-9]+
     ;
 
 NAME
-    : [a-zA-Z0-9]+
+    : [a-zA-Z0-9_-]+
     ;
 
 BOOLEAN
@@ -81,6 +83,10 @@ COMMENT
 
 STRING
     : '"' ~('\r' | '\n' | '"')* '"'
+    ;
+
+EOL
+    : ('\r'?'\n')
     ;
 
 WHITESPACE

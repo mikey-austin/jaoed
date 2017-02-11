@@ -7,7 +7,7 @@ import org.jaoed.config.ConfigVisitor;
 import org.jaoed.config.Section;
 import org.jaoed.config.Logger;
 
-class Acl implements Section {
+public class Acl implements Section {
     private String name;
     private Policy policy;
     private Logger logger;

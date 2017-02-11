@@ -8,7 +8,7 @@ import org.jaoed.config.Interface;
 import org.jaoed.config.Logger;
 import org.jaoed.config.Acl;
 
-class Config {
+public class Config {
     private List<Device> devices;
     private List<Interface> interfaces;
     private List<Logger> loggers;

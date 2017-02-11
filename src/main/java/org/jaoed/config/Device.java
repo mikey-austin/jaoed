@@ -7,7 +7,7 @@ import org.jaoed.config.Section;
 import org.jaoed.config.Acl;
 import org.jaoed.config.Interface;
 
-class Device implements Section {
+public class Device implements Section {
     private int shelf;
     private int slot;
     private String target;

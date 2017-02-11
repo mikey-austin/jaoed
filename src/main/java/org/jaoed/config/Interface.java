@@ -6,7 +6,7 @@ import org.jaoed.config.ConfigVisitor;
 import org.jaoed.config.Section;
 import org.jaoed.config.Logger;
 
-class Interface implements Section {
+public class Interface implements Section {
     private String networkInterface;
     private Mtu mtu;
     private Logger logger;
