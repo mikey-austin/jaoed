@@ -19,6 +19,7 @@ public class ConfigBuilder extends ConfigBaseListener {
     private HashMap<String, Logger> loggerTab;
     private HashMap<String, Interface> ifaceTab;
     private HashMap<String, Acl> aclTab;
+    private Section currentSection;
 
     public ConfigBuilder() {
         super();
@@ -30,6 +31,42 @@ public class ConfigBuilder extends ConfigBaseListener {
 
     public Config getConfig() {
         return config;
+    }
+
+	@Override
+    public void exitLoggerType(ConfigParser.LoggerTypeContext ctx) {
+        String type = ctx.getChild(2).getText();
+        Logger logger = type.equals("syslog")
+            ? new org.jaoed.config.logger.Syslog()
+            : new org.jaoed.config.logger.File();
+
+        // Record the above instantiated subclass, which will be fleshened
+        // on the call to the exitLoggerSection hook.
+        currentSection = logger;
+    }
+
+    @Override
+    public void exitLoggerSection(ConfigParser.LoggerSectionContext ctx) {
+        Logger logger = (Logger) currentSection;
+        ConfigParser.LoggerStatementsContext statements = ctx.loggerStatements();
+        for (ConfigParser.LoggerAssignmentContext assignment : statements.loggerAssignment()) {
+            if (assignment instanceof ConfigParser.LoggerNameContext) {
+                logger.setName(unquote(assignment.getChild(2).getText()));
+            } else if (assignment instanceof ConfigParser.LoggerFileContext) {
+                String file = unquote(assignment.getChild(2).getText());
+                ((org.jaoed.config.logger.File) logger).setFileName(file);
+            } else if (assignment instanceof ConfigParser.LoggerSyslogLevelContext) {
+                Integer level = new Integer(assignment.getChild(2).getText());
+                ((org.jaoed.config.logger.Syslog) logger).setLevel(level);
+            } else if (assignment instanceof ConfigParser.LoggerSyslogFacilityContext) {
+                Integer facility = new Integer(assignment.getChild(2).getText());
+                ((org.jaoed.config.logger.Syslog) logger).setFacility(facility);
+            }
+        }
+
+        currentSection = null;
+        config.addLogger(logger);
+        loggerTab.put(logger.getName(), logger);
     }
 
     @Override
@@ -53,6 +90,9 @@ public class ConfigBuilder extends ConfigBaseListener {
                     acl.addRejectedHost(host);
                 }
             } else if (assignment instanceof ConfigParser.AclLoggerContext) {
+                Logger logger = loggerTab.get(assignment.getChild(2).getText());
+                if (logger != null)
+                    acl.setLogger(logger);
             }
         }
 
