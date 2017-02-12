@@ -12,22 +12,8 @@ statements
     ;
 
 statement
-    : assignment
-    | section
+    : section
     | EOL
-    ;
-
-assignment
-    : assignmentName '=' INTEGER # intVal
-    | assignmentName '=' STRING  # strVal
-    | assignmentName '=' BOOLEAN # boolVal
-    | assignmentName '=' list    # listVal
-    | assignmentName '=' SYMBOL  # symVal
-    ;
-
-assignmentName
-    : SYMBOL
-    | ('device' | 'interface' | 'access-list' | 'logger')
     ;
 
 list
@@ -46,14 +32,63 @@ listEntry
     ;
 
 section
-    : 'logger' '{' sectionStatements '}'    # loggerSection
-    | 'interface' '{' sectionStatements '}' # interfaceSection
-    | 'device' '{' sectionStatements '}'    # deviceSection
-    | 'access-list' '{' aclStatements '}'   # aclSection
+    : 'logger' '{' loggerStatements '}'       # loggerSection
+    | 'interface' '{' interfaceStatements '}' # interfaceSection
+    | 'device' '{' deviceStatements '}'       # deviceSection
+    | 'acl' '{' aclStatements '}'             # aclSection
     ;
 
-sectionStatements
-    : EOL* assignment (EOL* assignment)* EOL*
+logLevel
+    : 'info'
+    | 'debug'
+    | 'trace'
+    ;
+
+//
+// Logger section syntax.
+//
+loggerStatements
+    : EOL* loggerAssignment (EOL* loggerAssignment)* EOL*
+    ;
+
+loggerAssignment
+    : 'name' '=' STRING              # loggerName
+    | 'type' '=' ('file' | 'syslog') # loggerType
+    | 'file' '=' STRING              # loggerFile
+    | 'syslog-level' '=' INTEGER     # loggerSyslogLevel
+    | 'syslog-facility' '=' INTEGER  # loggerSyslogFacility
+    ;
+
+//
+// Interface section syntax.
+//
+interfaceStatements
+    : EOL* interfaceAssignment (EOL* interfaceAssignment)* EOL*
+    ;
+
+interfaceAssignment
+    : 'interface' '=' STRING       # interfaceInterface
+    | 'mtu' '=' ('auto' | INTEGER) # interfaceMtu
+    | 'logger' '=' SYMBOL          # interfaceLogger
+    | 'log-level' '=' logLevel     # interfaceLogLevel
+    ;
+
+//
+// Device section syntax.
+//
+deviceStatements
+    : EOL* deviceAssignment (EOL* deviceAssignment)* EOL*
+    ;
+
+deviceAssignment
+    : 'shelf' '=' INTEGER              # deviceShelf
+    | 'slot' '=' INTEGER               # deviceSlot
+    | 'target' '=' STRING              # deviceTarget
+    | 'interface' '=' SYMBOL           # deviceInterface
+    | 'write-cache' '=' ('on' | 'off') # deviceWriteCache
+    | 'broadcast' '=' BOOLEAN          # deviceBroadcast
+    | 'logger' '=' SYMBOL              # deviceLogger
+    | 'log-level' '=' logLevel         # deviceLogLevel
     ;
 
 //
