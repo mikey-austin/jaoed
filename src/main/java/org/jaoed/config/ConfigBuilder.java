@@ -1,6 +1,9 @@
 package org.jaoed.config;
 
 import java.util.Stack;
+import java.util.List;
+import java.util.LinkedList;
+import java.lang.StringBuilder;
 
 import main.antlr4.org.jaoed.*;
 import org.antlr.v4.runtime.tree.*;
@@ -26,39 +29,48 @@ public class ConfigBuilder extends ConfigBaseListener {
     @Override
     public void exitAclSection(ConfigParser.AclSectionContext ctx) {
         Acl acl = new Acl();
-        ConfigParser.SectionStatementsContext statements = ctx.sectionStatements();
-        for (ConfigParser.AssignmentContext assignment : statements.assignment()) {
-            String varName = getVarName(assignment);
-            System.out.print("Found var " + varName + " in acl section -> ");
-
-            // We need to account for the value's type.
-            ParseTree value = assignment.getChild(2);
-            if (value instanceof TerminalNode) {
-                System.out.println(((TerminalNode) value).getText());
-            } else if (value instanceof ConfigParser.ListContext) {
-                System.out.println("list...");
+        ConfigParser.AclStatementsContext statements = ctx.aclStatements();
+        for (ConfigParser.AclAssignmentContext assignment : statements.aclAssignment()) {
+            if (assignment instanceof ConfigParser.AclNameContext) {
+                acl.setName(unquote(assignment.getChild(2).getText()));
+            } else if (assignment instanceof ConfigParser.AclPolicyContext) {
+                String policy = assignment.getChild(2).getText();
+                acl.setPolicy(policy.equals("accept")
+                    ? Acl.Policy.ACCEPT
+                    : Acl.Policy.REJECT);
+            } else if (assignment instanceof ConfigParser.AclAcceptContext) {
+                for (String host : getListStrings(assignment.getChild(2))) {
+                    acl.addAcceptedHost(host);
+                }
+            } else if (assignment instanceof ConfigParser.AclRejectContext) {
+                for (String host : getListStrings(assignment.getChild(2))) {
+                    acl.addRejectedHost(host);
+                }
+            } else if (assignment instanceof ConfigParser.AclLoggerContext) {
             }
         }
 
         config.addAcl(acl);
     }
 
-    private String getVarName(ConfigParser.AssignmentContext assignment) {
-        if (assignment instanceof ConfigParser.IntValContext) {
-            return ((ConfigParser.IntValContext) assignment)
-                .assignmentName().getChild(0).getText();
-        } else if (assignment instanceof ConfigParser.StrValContext) {
-            return ((ConfigParser.StrValContext) assignment)
-                .assignmentName().getChild(0).getText();
-        } else if (assignment instanceof ConfigParser.BoolValContext) {
-            return ((ConfigParser.BoolValContext) assignment)
-                .assignmentName().getChild(0).getText();
-        } else if (assignment instanceof ConfigParser.ListValContext) {
-            return ((ConfigParser.ListValContext) assignment)
-                .assignmentName().getChild(0).getText();
-        } else {
-            return ((ConfigParser.SymValContext) assignment)
-                .assignmentName().getChild(0).getText();
+    private List<String> getListStrings(ParseTree ctx) {
+        ConfigParser.ListContext listCtx = (ConfigParser.ListContext) ctx;
+        List<String> strings = new LinkedList<String>();
+
+        for (ConfigParser.ListEntryContext entry : listCtx.listStatements().listEntry()) {
+            if (entry instanceof ConfigParser.StrEntryContext) {
+                strings.add(
+                    unquote(((ConfigParser.StrEntryContext) entry).STRING().getText()));
+            }
         }
+
+        return strings;
+    }
+
+    private String unquote(String input) {
+        StringBuilder builder = new StringBuilder(input);
+        builder.deleteCharAt(builder.indexOf("\""));
+        builder.deleteCharAt(builder.lastIndexOf("\""));
+        return builder.toString();
     }
 }

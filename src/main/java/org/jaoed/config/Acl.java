@@ -1,7 +1,7 @@
 package org.jaoed.config;
 
 import java.util.List;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.jaoed.config.ConfigVisitor;
 import org.jaoed.config.Section;
@@ -14,14 +14,49 @@ public class Acl implements Section {
     private List<String> acceptedHosts;
     private List<String> rejectedHosts;
 
-    public Acl(int initialSize) {
-        acceptedHosts = new ArrayList<String>(initialSize);
-        rejectedHosts = new ArrayList<String>(initialSize);
+    public Acl() {
+        acceptedHosts = new LinkedList<String>();
+        rejectedHosts = new LinkedList<String>();
     }
 
-    public Acl() {
-        acceptedHosts = new ArrayList<String>();
-        rejectedHosts = new ArrayList<String>();
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Policy getPolicy() {
+        return policy;
+    }
+
+    public void setPolicy(Policy policy) {
+        this.policy = policy;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
+    public void addAcceptedHost(String host) {
+        acceptedHosts.add(host);
+    }
+
+    public List<String> getAcceptedHosts() {
+        return acceptedHosts;
+    }
+
+    public void addRejectedHost(String host) {
+        rejectedHosts.add(host);
+    }
+
+    public List<String> getRejectedHosts() {
+        return rejectedHosts;
     }
 
     public void acceptVisitor(ConfigVisitor visitor) {
@@ -31,5 +66,17 @@ public class Acl implements Section {
     public enum Policy {
         ACCEPT,
         REJECT
+    }
+
+    @Override
+    public String toString() {
+        String out = "Acl[" + name + "]:\n"
+            + " -> policy = " + policy + "\n"
+            + " -> accept = " + acceptedHosts + "\n"
+            + " -> reject = " + rejectedHosts + "\n";
+        if (logger != null)
+            out += " -> logger = " + logger.getName() + "\n";
+
+        return out;
     }
 }

@@ -46,14 +46,29 @@ listEntry
     ;
 
 section
-    : 'logger' '{' sectionStatements '}'      # loggerSection
-    | 'interface' '{' sectionStatements '}'   # interfaceSection
-    | 'device' '{' sectionStatements '}'      # deviceSection
-    | 'access-list' '{' sectionStatements '}' # aclSection
+    : 'logger' '{' sectionStatements '}'    # loggerSection
+    | 'interface' '{' sectionStatements '}' # interfaceSection
+    | 'device' '{' sectionStatements '}'    # deviceSection
+    | 'access-list' '{' aclStatements '}'   # aclSection
     ;
 
 sectionStatements
     : EOL* assignment (EOL* assignment)* EOL*
+    ;
+
+//
+// Acl section syntax.
+//
+aclStatements
+    : EOL* aclAssignment (EOL* aclAssignment)* EOL*
+    ;
+
+aclAssignment
+    : 'name' '=' STRING                  # aclName
+    | 'policy' '=' ('accept' | 'reject') # aclPolicy
+    | 'accept' '=' list                  # aclAccept
+    | 'reject' '=' list                  # aclReject
+    | 'logger' '=' SYMBOL                # aclLogger
     ;
 
 //
