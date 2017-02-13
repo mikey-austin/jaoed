@@ -42,12 +42,12 @@ public class Config {
         String out = "Config:\n";
         if (loggers.size() > 0)
             out += loggers + "\n";
+        if (acls.size() > 0)
+            out += acls + "\n";
         if (interfaces.size() > 0)
             out += interfaces + "\n";
         if (devices.size() > 0)
             out += devices + "\n";
-        if (acls.size() > 0)
-            out += acls + "\n";
         return out;
     }
 }

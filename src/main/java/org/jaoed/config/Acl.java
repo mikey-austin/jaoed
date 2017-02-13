@@ -80,7 +80,7 @@ public class Acl implements Section {
 
     @Override
     public String toString() {
-        String out = "Acl[" + name + "]:\n"
+        String out = "Acl<" + name + ">:\n"
             + " -> policy = " + policy + "\n"
             + " -> accept = " + acceptedHosts + "\n"
             + " -> reject = " + rejectedHosts + "\n";

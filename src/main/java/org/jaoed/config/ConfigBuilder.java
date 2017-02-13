@@ -126,6 +126,42 @@ public class ConfigBuilder extends ConfigBaseListener {
         ifaceTab.put(iface.getName(), iface);
     }
 
+    @Override
+    public void exitDeviceSection(ConfigParser.DeviceSectionContext ctx) {
+        Device device = new Device();
+        ConfigParser.DeviceStatementsContext statements = ctx.deviceStatements();
+        for (ConfigParser.DeviceAssignmentContext assignment : statements.deviceAssignment()) {
+            if (assignment instanceof ConfigParser.DeviceTargetContext) {
+                device.setTarget(unquote(assignment.getChild(2).getText()));
+            } else if (assignment instanceof ConfigParser.DeviceShelfContext) {
+                String shelf = assignment.getChild(2).getText();
+                device.setShelf(new Integer(shelf));
+            } else if (assignment instanceof ConfigParser.DeviceSlotContext) {
+                String slot = assignment.getChild(2).getText();
+                device.setSlot(new Integer(slot));
+            } else if (assignment instanceof ConfigParser.DeviceWriteCacheContext) {
+                String writeCache = assignment.getChild(2).getText();
+                device.setWriteCache(writeCache.equals("on") ? true : false);
+            } else if (assignment instanceof ConfigParser.DeviceBroadcastContext) {
+                String broadcast = assignment.getChild(2).getText();
+                device.setBroadcast(broadcast.equals("true") ? true : false);
+            } else if (assignment instanceof ConfigParser.DeviceInterfaceContext) {
+                Interface iface = ifaceTab.get(assignment.getChild(2).getText());
+                if (iface != null)
+                    device.setInterface(iface);
+            } else if (assignment instanceof ConfigParser.DeviceLoggerContext) {
+                Logger logger = loggerTab.get(assignment.getChild(2).getText());
+                if (logger != null)
+                    device.setLogger(logger);
+            } else if (assignment instanceof ConfigParser.DeviceLogLevelContext) {
+                String level = assignment.getChild(2).getText();
+                device.setLogLevel(Logger.makeLevel(level));
+            }
+        }
+
+        config.addDevice(device);
+    }
+
     private List<String> getListStrings(ParseTree ctx) {
         ConfigParser.ListContext listCtx = (ConfigParser.ListContext) ctx;
         List<String> strings = new LinkedList<String>();

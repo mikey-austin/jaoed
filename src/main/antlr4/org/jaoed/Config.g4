@@ -28,7 +28,7 @@ listStatements
 listEntry
     : INTEGER # intEntry
     | STRING  # strEntry
-    | BOOLEAN # boolEntry
+    | bool # boolEntry
     ;
 
 section
@@ -42,6 +42,11 @@ logLevel
     : 'info'
     | 'debug'
     | 'trace'
+    ;
+
+bool
+    : 'true'
+    | 'false'
     ;
 
 //
@@ -86,7 +91,7 @@ deviceAssignment
     | 'target' '=' STRING              # deviceTarget
     | 'interface' '=' SYMBOL           # deviceInterface
     | 'write-cache' '=' ('on' | 'off') # deviceWriteCache
-    | 'broadcast' '=' BOOLEAN          # deviceBroadcast
+    | 'broadcast' '=' bool             # deviceBroadcast
     | 'logger' '=' SYMBOL              # deviceLogger
     | 'log-level' '=' logLevel         # deviceLogLevel
     ;
@@ -117,11 +122,6 @@ INTEGER
 
 SYMBOL
     : [a-zA-Z0-9_-]+
-    ;
-
-BOOLEAN
-    : 'true'
-    | 'false'
     ;
 
 COMMENT

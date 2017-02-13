@@ -12,10 +12,11 @@ public class Device implements Section {
     private int shelf;
     private int slot;
     private String target;
-    private Interface networkInterface;
+    private Interface iface;
     private boolean writeCache;
     private boolean broadcast;
     private DeviceAcl acl;
+    private Logger logger;
     private Logger.Level logLevel;
 
     public Device() {
@@ -46,12 +47,12 @@ public class Device implements Section {
         this.target = target;
     }
 
-    public Interface getNetworkInterface() {
-        return networkInterface;
+    public Interface getInterface() {
+        return iface;
     }
 
-    public void setInterface(Interface networkInterface) {
-        this.networkInterface = networkInterface;
+    public void setInterface(Interface iface) {
+        this.iface = iface;
     }
 
     public boolean isWriteCacheOn() {
@@ -81,6 +82,14 @@ public class Device implements Section {
         this.acl.setWrite(write);
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
     public Logger.Level getLogLevel() {
         return logLevel;
     }
@@ -91,6 +100,22 @@ public class Device implements Section {
 
     public void acceptVisitor(ConfigVisitor visitor) {
         visitor.visitDevice(this);
+    }
+
+    @Override
+    public String toString() {
+        String out = "Device<" + target + ">:\n"
+            + " -> shelf = " + Integer.toString(shelf) + "\n"
+            + " -> slot = " + Integer.toString(slot) + "\n"
+            + " -> write-cache = " + Boolean.toString(writeCache) + "\n"
+            + " -> broadcast = " + Boolean.toString(broadcast) + "\n"
+            + " -> iface = " + iface.getName() + "\n";
+        if (logger != null) {
+            out += " -> logger = " + logger.getName() + "\n"
+                + " -> log-level = " + logLevel + "\n";
+        }
+
+        return out;
     }
 
     public class DeviceAcl {
