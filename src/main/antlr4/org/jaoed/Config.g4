@@ -94,6 +94,22 @@ deviceAssignment
     | 'broadcast' '=' bool             # deviceBroadcast
     | 'logger' '=' SYMBOL              # deviceLogger
     | 'log-level' '=' logLevel         # deviceLogLevel
+    | deviceAclSection                 # deviceAcl
+    ;
+
+deviceAclSection
+    : 'acl' '{' deviceAclStatements '}'
+    ;
+
+deviceAclStatements
+    : EOL* deviceAclAssignment (EOL* deviceAclAssignment)* EOL*
+    ;
+
+deviceAclAssignment
+    : 'cfg-read' '=' SYMBOL # deviceAclCfgRead
+    | 'cfg-set' '=' SYMBOL  # deviceAclCfgSet
+    | 'read' '=' SYMBOL     # deviceAclRead
+    | 'write' '=' SYMBOL    # deviceAclWrite
     ;
 
 //

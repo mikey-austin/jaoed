@@ -15,13 +15,11 @@ public class Device implements Section {
     private Interface iface;
     private boolean writeCache;
     private boolean broadcast;
-    private DeviceAcl acl;
+    private DeviceAcl acls;
     private Logger logger;
     private Logger.Level logLevel;
 
-    public Device() {
-        acl = new DeviceAcl();
-    }
+    public Device() {}
 
     public int getShelf() {
         return shelf;
@@ -72,14 +70,11 @@ public class Device implements Section {
     }
 
     public DeviceAcl getAcls() {
-        return acl;
+        return acls;
     }
 
-    public void setAcls(Acl cfgRead, Acl cfgSet, Acl read, Acl write) {
-        this.acl.setCfgRead(cfgRead);
-        this.acl.setCfgSet(cfgSet);
-        this.acl.setRead(read);
-        this.acl.setWrite(write);
+    public void setAcls(DeviceAcl acls) {
+        this.acls = acls;
     }
 
     public Logger getLogger() {
@@ -110,15 +105,20 @@ public class Device implements Section {
             + " -> write-cache = " + Boolean.toString(writeCache) + "\n"
             + " -> broadcast = " + Boolean.toString(broadcast) + "\n"
             + " -> iface = " + iface.getName() + "\n";
+
         if (logger != null) {
             out += " -> logger = " + logger.getName() + "\n"
                 + " -> log-level = " + logLevel + "\n";
         }
 
+        if (acls != null) {
+            out += " -> acls = " + acls + "\n";
+        }
+
         return out;
     }
 
-    public class DeviceAcl {
+    public static class DeviceAcl implements Section {
         private Acl cfgRead;
         private Acl cfgSet;
         private Acl read;
@@ -156,6 +156,26 @@ public class Device implements Section {
 
         public Acl getWrite() {
             return write;
+        }
+
+        public void acceptVisitor(ConfigVisitor visitor) {}
+
+        @Override
+        public String toString() {
+            String out = "";
+            if (cfgRead != null || cfgSet != null || read != null || write != null) {
+                out += "Acls [ ";
+                if (cfgRead != null)
+                    out += "<cfgRead: " + cfgRead.getName() + "> ";
+                if (cfgSet != null)
+                    out += "<cfgSet: " + cfgSet.getName() + "> ";
+                if (read != null)
+                    out += "<read: " + read.getName() + "> ";
+                if (write != null)
+                    out += "<write: " + write.getName() + "> ";
+                out += "]";
+            }
+            return out;
         }
     }
 }

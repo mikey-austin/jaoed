@@ -127,8 +127,36 @@ public class ConfigBuilder extends ConfigBaseListener {
     }
 
     @Override
+    public void exitDeviceAclSection(ConfigParser.DeviceAclSectionContext ctx) {
+        Device.DeviceAcl acls = new Device.DeviceAcl();
+        ConfigParser.DeviceAclStatementsContext statements = ctx.deviceAclStatements();
+        for (ConfigParser.DeviceAclAssignmentContext assignment : statements.deviceAclAssignment()) {
+            if (assignment instanceof ConfigParser.DeviceAclCfgReadContext) {
+                Acl acl = aclTab.get(assignment.getChild(2).getText());
+                if (acl != null)
+                    acls.setCfgRead(acl);
+            } else if (assignment instanceof ConfigParser.DeviceAclCfgSetContext) {
+                Acl acl = aclTab.get(assignment.getChild(2).getText());
+                if (acl != null)
+                    acls.setCfgSet(acl);
+            } else if (assignment instanceof ConfigParser.DeviceAclReadContext) {
+                Acl acl = aclTab.get(assignment.getChild(2).getText());
+                if (acl != null)
+                    acls.setRead(acl);
+            } else if (assignment instanceof ConfigParser.DeviceAclWriteContext) {
+                Acl acl = aclTab.get(assignment.getChild(2).getText());
+                if (acl != null)
+                    acls.setWrite(acl);
+            }
+        }
+
+        currentSection = acls;
+    }
+
+    @Override
     public void exitDeviceSection(ConfigParser.DeviceSectionContext ctx) {
         Device device = new Device();
+
         ConfigParser.DeviceStatementsContext statements = ctx.deviceStatements();
         for (ConfigParser.DeviceAssignmentContext assignment : statements.deviceAssignment()) {
             if (assignment instanceof ConfigParser.DeviceTargetContext) {
@@ -157,6 +185,11 @@ public class ConfigBuilder extends ConfigBaseListener {
                 String level = assignment.getChild(2).getText();
                 device.setLogLevel(Logger.makeLevel(level));
             }
+        }
+
+        if (currentSection instanceof Device.DeviceAcl) {
+            device.setAcls((Device.DeviceAcl) currentSection);
+            currentSection = null;
         }
 
         config.addDevice(device);
