@@ -158,7 +158,9 @@ public class Device implements Section {
             return write;
         }
 
-        public void acceptVisitor(ConfigVisitor visitor) {}
+        public void acceptVisitor(ConfigVisitor visitor) {
+            visitor.visitDeviceAcl(this);
+        }
 
         @Override
         public String toString() {
