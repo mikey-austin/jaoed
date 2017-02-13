@@ -93,11 +93,37 @@ public class ConfigBuilder extends ConfigBaseListener {
                 Logger logger = loggerTab.get(assignment.getChild(2).getText());
                 if (logger != null)
                     acl.setLogger(logger);
+            } else if (assignment instanceof ConfigParser.AclLogLevelContext) {
+                String level = assignment.getChild(2).getText();
+                acl.setLogLevel(Logger.makeLevel(level));
             }
         }
 
         config.addAcl(acl);
         aclTab.put(acl.getName(), acl);
+    }
+
+    @Override
+    public void exitInterfaceSection(ConfigParser.InterfaceSectionContext ctx) {
+        Interface iface = new Interface();
+        ConfigParser.InterfaceStatementsContext statements = ctx.interfaceStatements();
+        for (ConfigParser.InterfaceAssignmentContext assignment : statements.interfaceAssignment()) {
+            if (assignment instanceof ConfigParser.InterfaceNameContext) {
+                iface.setName(unquote(assignment.getChild(2).getText()));
+            } else if (assignment instanceof ConfigParser.InterfaceMtuContext) {
+                iface.setMtu(assignment.getChild(2).getText());
+            } else if (assignment instanceof ConfigParser.InterfaceLoggerContext) {
+                Logger logger = loggerTab.get(assignment.getChild(2).getText());
+                if (logger != null)
+                    iface.setLogger(logger);
+            } else if (assignment instanceof ConfigParser.InterfaceLogLevelContext) {
+                String level = assignment.getChild(2).getText();
+                iface.setLogLevel(Logger.makeLevel(level));
+            }
+        }
+
+        config.addInterface(iface);
+        ifaceTab.put(iface.getName(), iface);
     }
 
     private List<String> getListStrings(ParseTree ctx) {

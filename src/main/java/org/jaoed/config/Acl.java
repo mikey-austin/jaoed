@@ -13,10 +13,12 @@ public class Acl implements Section {
     private Logger logger;
     private List<String> acceptedHosts;
     private List<String> rejectedHosts;
+    private Logger.Level logLevel;
 
     public Acl() {
         acceptedHosts = new LinkedList<String>();
         rejectedHosts = new LinkedList<String>();
+        logLevel = Logger.Level.INFO;
     }
 
     public String getName() {
@@ -59,6 +61,14 @@ public class Acl implements Section {
         return rejectedHosts;
     }
 
+    public Logger.Level getLogLevel() {
+        return logLevel;
+    }
+
+    public void setLogLevel(Logger.Level logLevel) {
+        this.logLevel = logLevel;
+    }
+
     public void acceptVisitor(ConfigVisitor visitor) {
         visitor.visitAcl(this);
     }
@@ -74,8 +84,10 @@ public class Acl implements Section {
             + " -> policy = " + policy + "\n"
             + " -> accept = " + acceptedHosts + "\n"
             + " -> reject = " + rejectedHosts + "\n";
-        if (logger != null)
-            out += " -> logger = " + logger.getName() + "\n";
+        if (logger != null) {
+            out += " -> logger = " + logger.getName() + "\n"
+                + " -> log-level = " + logLevel + "\n";
+        }
 
         return out;
     }

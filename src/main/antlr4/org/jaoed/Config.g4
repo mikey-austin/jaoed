@@ -67,7 +67,7 @@ interfaceStatements
     ;
 
 interfaceAssignment
-    : 'interface' '=' STRING       # interfaceInterface
+    : 'name' '=' STRING            # interfaceName
     | 'mtu' '=' ('auto' | INTEGER) # interfaceMtu
     | 'logger' '=' SYMBOL          # interfaceLogger
     | 'log-level' '=' logLevel     # interfaceLogLevel
@@ -104,6 +104,7 @@ aclAssignment
     | 'accept' '=' list                  # aclAccept
     | 'reject' '=' list                  # aclReject
     | 'logger' '=' SYMBOL                # aclLogger
+    | 'log-level' '=' logLevel           # aclLogLevel
     ;
 
 //

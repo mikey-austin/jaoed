@@ -20,6 +20,16 @@ public class Logger implements Section {
         visitor.visitLogger(this);
     }
 
+    public static Level makeLevel(String level) {
+        if (level.equals("debug")) {
+            return Level.DEBUG;
+        } else if (level.equals("trace")) {
+            return Level.TRACE;
+        }
+
+        return Level.INFO;
+    }
+
     public enum Level {
         INFO,
         DEBUG,
