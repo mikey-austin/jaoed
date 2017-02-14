@@ -33,7 +33,7 @@ public class ConfigBuilder extends ConfigBaseListener {
         return config;
     }
 
-	@Override
+    @Override
     public void exitLoggerType(ConfigParser.LoggerTypeContext ctx) {
         String type = ctx.getChild(2).getText();
         Logger logger = type.equals("syslog")
