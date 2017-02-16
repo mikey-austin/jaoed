@@ -23,17 +23,35 @@ public class Config {
         acls = new HashMap<String, Acl>();
     }
 
-    public static Config parseString(String data) throws IOException {
+    public static Config parseString(String data)
+        throws IOException, ValidationException {
+
+        return parseString(data, true);
+    }
+
+    public static Config parseString(String data, boolean validate)
+        throws IOException, ValidationException {
+
         CharStream stream = (CharStream) new ANTLRInputStream(data);
-        return parseInputStream(stream);
+        return parseInputStream(stream, validate);
     }
 
-    public static Config parseFile(String fileName) throws IOException {
+    public static Config parseFile(String fileName)
+        throws IOException, ValidationException {
+
+        return parseFile(fileName, true);
+    }
+
+    public static Config parseFile(String fileName, boolean validate)
+        throws IOException, ValidationException {
+
         CharStream stream = (CharStream) new ANTLRFileStream(fileName);
-        return parseInputStream(stream);
+        return parseInputStream(stream, validate);
     }
 
-    public static Config parseInputStream(CharStream stream) throws IOException {
+    public static Config parseInputStream(CharStream stream, boolean validate)
+        throws IOException, ValidationException {
+
         ConfigLexer lexer = new ConfigLexer(stream);
         TokenStream tokenStream = new CommonTokenStream(lexer);
         ConfigParser parser = new ConfigParser(tokenStream);
@@ -44,7 +62,7 @@ public class Config {
         parser.config();
 
         // Collect the built configuration.
-        return builder.getConfig();
+        return builder.getConfig(validate);
     }
 
     public List<Device> getDevices() {
@@ -77,6 +95,24 @@ public class Config {
 
     public void addAcl(Acl acl) {
         acls.put(acl.getName(), acl);
+    }
+
+    public void validate() throws ValidationException {
+        Validator validator = new Validator();
+
+        for (Logger logger : loggers.values())
+            logger.acceptVisitor(validator);
+        for (Acl acl : acls.values())
+            acl.acceptVisitor(validator);
+        for (Interface iface : interfaces.values())
+            iface.acceptVisitor(validator);
+        for (Device device : devices) {
+            device.acceptVisitor(validator);
+            if (device.getAcls() != null)
+                device.getAcls().acceptVisitor(validator);
+        }
+
+        validator.validate();
     }
 
     @Override

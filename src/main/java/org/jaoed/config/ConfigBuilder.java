@@ -29,7 +29,14 @@ public class ConfigBuilder extends ConfigBaseListener {
         aclTab = new HashMap<String, Acl>();
     }
 
-    public Config getConfig() {
+    public Config getConfig() throws ValidationException {
+        config.validate();
+        return config;
+    }
+
+    public Config getConfig(boolean validate) throws ValidationException {
+        if (validate)
+            config.validate();
         return config;
     }
 
