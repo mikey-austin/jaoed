@@ -1,7 +1,10 @@
 package org.jaoed.config;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
+import java.util.Collection;
 import java.util.ArrayList;
 
 import main.antlr4.org.jaoed.*;
@@ -9,15 +12,15 @@ import org.antlr.v4.runtime.*;
 
 public class Config {
     private List<Device> devices;
-    private List<Interface> interfaces;
-    private List<Logger> loggers;
-    private List<Acl> acls;
+    private Map<String, Interface> interfaces;
+    private Map<String, Logger> loggers;
+    private Map<String, Acl> acls;
 
     public Config() {
         devices = new ArrayList<Device>();
-        interfaces = new ArrayList<Interface>();
-        loggers = new ArrayList<Logger>();
-        acls = new ArrayList<Acl>();
+        interfaces = new HashMap<String, Interface>();
+        loggers = new HashMap<String, Logger>();
+        acls = new HashMap<String, Acl>();
     }
 
     public static Config parseString(String data) throws IOException {
@@ -48,33 +51,32 @@ public class Config {
         return devices;
     }
 
-
-    public List<Interface> getInterfaces() {
-        return interfaces;
+    public Collection<Interface> getInterfaces() {
+        return interfaces.values();
     }
 
-    public List<Acl> getAcls() {
-        return acls;
+    public Collection<Acl> getAcls() {
+        return acls.values();
     }
 
-    public List<Logger> getLoggers() {
-        return loggers;
+    public Collection<Logger> getLoggers() {
+        return loggers.values();
     }
 
     public void addDevice(Device device) {
         devices.add(device);
     }
 
-    public void addInterface(Interface networkInterface) {
-        interfaces.add(networkInterface);
+    public void addInterface(Interface iface) {
+        interfaces.put(iface.getName(), iface);
     }
 
     public void addLogger(Logger logger) {
-        loggers.add(logger);
+        loggers.put(logger.getName(), logger);
     }
 
     public void addAcl(Acl acl) {
-        acls.add(acl);
+        acls.put(acl.getName(), acl);
     }
 
     @Override

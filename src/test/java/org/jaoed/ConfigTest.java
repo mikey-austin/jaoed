@@ -4,6 +4,7 @@ import java.io.IOException;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import java.util.Collection;
 
 import org.jaoed.config.*;
 
@@ -25,6 +26,7 @@ public class ConfigTest extends TestCase {
         assertNotNull(file);
 
         Config config = Config.parseFile(file);
+        assertNotNull(config);
 
         // Test parsed devices.
         assertTrue("parsed devices ok", config.getDevices().size() == 2);
