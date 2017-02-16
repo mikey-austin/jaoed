@@ -48,11 +48,11 @@ public class ConfigBuilder extends ConfigBaseListener {
     @Override
     public void exitLoggerSection(ConfigParser.LoggerSectionContext ctx) {
         Logger logger = (Logger) currentSection;
+        logger.setName(ctx.getChild(1).getText());
+
         ConfigParser.LoggerStatementsContext statements = ctx.loggerStatements();
         for (ConfigParser.LoggerAssignmentContext assignment : statements.loggerAssignment()) {
-            if (assignment instanceof ConfigParser.LoggerNameContext) {
-                logger.setName(unquote(assignment.getChild(2).getText()));
-            } else if (assignment instanceof ConfigParser.LoggerFileContext) {
+            if (assignment instanceof ConfigParser.LoggerFileContext) {
                 String file = unquote(assignment.getChild(2).getText());
                 ((org.jaoed.config.logger.File) logger).setFileName(file);
             } else if (assignment instanceof ConfigParser.LoggerSyslogLevelContext) {
@@ -72,11 +72,11 @@ public class ConfigBuilder extends ConfigBaseListener {
     @Override
     public void exitAclSection(ConfigParser.AclSectionContext ctx) {
         Acl acl = new Acl();
+        acl.setName(ctx.getChild(1).getText());
+
         ConfigParser.AclStatementsContext statements = ctx.aclStatements();
         for (ConfigParser.AclAssignmentContext assignment : statements.aclAssignment()) {
-            if (assignment instanceof ConfigParser.AclNameContext) {
-                acl.setName(unquote(assignment.getChild(2).getText()));
-            } else if (assignment instanceof ConfigParser.AclPolicyContext) {
+            if (assignment instanceof ConfigParser.AclPolicyContext) {
                 String policy = assignment.getChild(2).getText();
                 acl.setPolicy(policy.equals("accept")
                     ? Acl.Policy.ACCEPT
@@ -106,11 +106,11 @@ public class ConfigBuilder extends ConfigBaseListener {
     @Override
     public void exitInterfaceSection(ConfigParser.InterfaceSectionContext ctx) {
         Interface iface = new Interface();
+        iface.setName(ctx.getChild(1).getText());
+
         ConfigParser.InterfaceStatementsContext statements = ctx.interfaceStatements();
         for (ConfigParser.InterfaceAssignmentContext assignment : statements.interfaceAssignment()) {
-            if (assignment instanceof ConfigParser.InterfaceNameContext) {
-                iface.setName(unquote(assignment.getChild(2).getText()));
-            } else if (assignment instanceof ConfigParser.InterfaceMtuContext) {
+            if (assignment instanceof ConfigParser.InterfaceMtuContext) {
                 iface.setMtu(assignment.getChild(2).getText());
             } else if (assignment instanceof ConfigParser.InterfaceLoggerContext) {
                 Logger logger = loggerTab.get(assignment.getChild(2).getText());

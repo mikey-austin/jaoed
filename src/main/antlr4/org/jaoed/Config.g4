@@ -32,10 +32,10 @@ listEntry
     ;
 
 section
-    : 'logger' '{' loggerStatements '}'       # loggerSection
-    | 'interface' '{' interfaceStatements '}' # interfaceSection
-    | 'device' '{' deviceStatements '}'       # deviceSection
-    | 'acl' '{' aclStatements '}'             # aclSection
+    : 'logger' SYMBOL '{' loggerStatements '}'       # loggerSection
+    | 'interface' SYMBOL '{' interfaceStatements '}' # interfaceSection
+    | 'acl' SYMBOL '{' aclStatements '}'             # aclSection
+    | 'device' '{' deviceStatements '}'              # deviceSection
     ;
 
 logLevel
@@ -57,8 +57,7 @@ loggerStatements
     ;
 
 loggerAssignment
-    : 'name' '=' STRING              # loggerName
-    | 'type' '=' ('file' | 'syslog') # loggerType
+    : 'type' '=' ('file' | 'syslog') # loggerType
     | 'file' '=' STRING              # loggerFile
     | 'syslog-level' '=' INTEGER     # loggerSyslogLevel
     | 'syslog-facility' '=' INTEGER  # loggerSyslogFacility
@@ -72,8 +71,7 @@ interfaceStatements
     ;
 
 interfaceAssignment
-    : 'name' '=' STRING            # interfaceName
-    | 'mtu' '=' ('auto' | INTEGER) # interfaceMtu
+    : 'mtu' '=' ('auto' | INTEGER) # interfaceMtu
     | 'logger' '=' SYMBOL          # interfaceLogger
     | 'log-level' '=' logLevel     # interfaceLogLevel
     ;
@@ -120,8 +118,7 @@ aclStatements
     ;
 
 aclAssignment
-    : 'name' '=' STRING                  # aclName
-    | 'policy' '=' ('accept' | 'reject') # aclPolicy
+    : 'policy' '=' ('accept' | 'reject') # aclPolicy
     | 'accept' '=' list                  # aclAccept
     | 'reject' '=' list                  # aclReject
     | 'logger' '=' SYMBOL                # aclLogger
