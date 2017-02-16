@@ -10,15 +10,16 @@ import org.jaoed.config.Logger;
 public class Acl implements Section {
     private String name;
     private Policy policy;
-    private Logger logger;
     private List<String> acceptedHosts;
     private List<String> rejectedHosts;
+    private Logger logger;
     private Logger.Level logLevel;
 
     public Acl() {
         acceptedHosts = new LinkedList<String>();
         rejectedHosts = new LinkedList<String>();
         logLevel = Logger.Level.INFO;
+        policy = Policy.REJECT;
     }
 
     public String getName() {
@@ -76,6 +77,11 @@ public class Acl implements Section {
     public enum Policy {
         ACCEPT,
         REJECT
+    }
+
+    public void validate() throws ValidationException {
+        if (name == null)
+            throw new ValidationException("Acl name required");
     }
 
     @Override

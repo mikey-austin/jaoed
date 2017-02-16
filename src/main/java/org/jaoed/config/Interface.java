@@ -12,7 +12,9 @@ public class Interface implements Section {
     private Logger logger;
     private Logger.Level logLevel;
 
-    public Interface() {}
+    public Interface() {
+        logLevel = Logger.Level.INFO;
+    }
 
     public void acceptVisitor(ConfigVisitor visitor) {
         visitor.visitInterface(this);
@@ -64,6 +66,11 @@ public class Interface implements Section {
         }
 
         return out;
+    }
+
+    public void validate() throws ValidationException {
+        if (name == null)
+            throw new ValidationException("Interface name required");
     }
 
     public class Mtu {
