@@ -77,7 +77,7 @@ public class Config {
         if (interfaces.size() > 0)
             out += interfaces + "\n";
         if (devices.size() > 0)
-            out += devices + "\n";
+            out += devices;
         return out;
     }
 }

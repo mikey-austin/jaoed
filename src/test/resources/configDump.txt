@@ -1,0 +1,35 @@
+Config:
+{acllog=Logger<File>[acllog]:
+ -> file = /tmp/qaoed_acl.log
+, main=Logger<Syslog>[main]:
+ -> level = 0
+ -> facility = 3
+}
+{reject-acl=Acl<reject-acl>:
+ -> policy = REJECT
+ -> accept = []
+ -> reject = [00:12:55:BB:EE:FF]
+ -> logger = acllog
+ -> log-level = DEBUG
+, acl1=Acl<acl1>:
+ -> policy = ACCEPT
+ -> accept = [00:12:23:45:66:FF, 00:10:33:43:32:FF]
+ -> reject = [00:12:23:BB:EE:FF]
+ -> logger = acllog
+ -> log-level = TRACE
+}
+{eth0=Interface<eth0>:
+ -> mtu = auto
+ -> logger = main
+ -> log-level = DEBUG
+}
+[Device</tmp>:
+ -> shelf = 0
+ -> slot = 2
+ -> write-cache = true
+ -> broadcast = true
+ -> iface = eth0
+ -> logger = main
+ -> log-level = TRACE
+ -> acls = Acls [ <cfgRead: acl1> <cfgSet: acl1> <read: reject-acl> <write: acl1> ]
+]

@@ -6,7 +6,10 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import java.util.Collection;
+import java.util.Arrays;
+import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.jaoed.config.*;
 
 public class ConfigTest extends TestCase {
@@ -43,6 +46,32 @@ public class ConfigTest extends TestCase {
 
         // Test parsed interfaces.
         assertTrue("parsed interfaces ok", config.getInterfaces().size() == 2);
+    }
+
+    public void testConfigContents() throws IOException, ValidationException {
+        String expectedPath = getClass()
+            .getClassLoader()
+            .getResource("configDump.txt")
+            .getFile();
+        assertNotNull(expectedPath);
+        File expected = new File(expectedPath);
+        assertNotNull(expected);
+
+        String file = getClass()
+            .getClassLoader()
+            .getResource("configTest2.conf")
+            .getFile();
+        assertNotNull(file);
+
+        Validator validator = new MockValidator();
+        ConfigBuilder builder = new ConfigBuilder(validator);
+        builder.parseFile(file);
+        Config config = builder.getConfig();
+        assertNotNull(config);
+
+        // Compare dump to expected contents.
+        List<String> lines = Arrays.asList(config.toString().split("\n"));
+        assertEquals(FileUtils.readLines(expected), lines);
     }
 
     public void testDuplicateDeviceTargets() throws IOException, ValidationException {
