@@ -5,11 +5,14 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java.lang.StringBuilder;
+import java.io.IOException;
 
 import main.antlr4.org.jaoed.*;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import org.jaoed.config.Config;
+import org.jaoed.config.Validator;
 import org.jaoed.config.Device;
 import org.jaoed.config.Interface;
 import org.jaoed.config.Logger;
@@ -20,24 +23,47 @@ public class ConfigBuilder extends ConfigBaseListener {
     private HashMap<String, Interface> ifaceTab;
     private HashMap<String, Acl> aclTab;
     private Section currentSection;
+    private Validator validator;
 
     public ConfigBuilder() {
+        this(new Validator());
+    }
+
+    public ConfigBuilder(Validator validator) {
         super();
-        config = new Config();
-        loggerTab = new HashMap<String, Logger>();
-        ifaceTab = new HashMap<String, Interface>();
-        aclTab = new HashMap<String, Acl>();
+        this.config = new Config();
+        this.loggerTab = new HashMap<String, Logger>();
+        this.ifaceTab = new HashMap<String, Interface>();
+        this.aclTab = new HashMap<String, Acl>();
+        this.validator = validator;
     }
 
     public Config getConfig() throws ValidationException {
-        config.validate();
+        config.validate(validator);
         return config;
     }
 
-    public Config getConfig(boolean validate) throws ValidationException {
-        if (validate)
-            config.validate();
-        return config;
+    public void parseString(String data) throws IOException {
+        CharStream stream = (CharStream) new ANTLRInputStream(data);
+        parseInputStream(stream);
+    }
+
+    public void parseFile(String fileName) throws IOException {
+        CharStream stream = (CharStream) new ANTLRFileStream(fileName);
+        parseInputStream(stream);
+    }
+
+    public void parseInputStream(CharStream stream)
+        throws IOException {
+
+        ConfigLexer lexer = new ConfigLexer(stream);
+        TokenStream tokenStream = new CommonTokenStream(lexer);
+        ConfigParser parser = new ConfigParser(tokenStream);
+        ConfigBuilder builder = new ConfigBuilder();
+
+        // Start the parser.
+        parser.addParseListener(this);
+        parser.config();
     }
 
     @Override

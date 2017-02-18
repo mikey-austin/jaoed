@@ -26,7 +26,10 @@ public class ConfigTest extends TestCase {
             .getFile();
         assertNotNull(file);
 
-        Config config = Config.parseFile(file, false);
+        Validator validator = new MockValidator();
+        ConfigBuilder builder = new ConfigBuilder(validator);
+        builder.parseFile(file);
+        Config config = builder.getConfig();
         assertNotNull(config);
 
         // Test parsed devices.
@@ -56,7 +59,10 @@ public class ConfigTest extends TestCase {
             + "}";
 
         try {
-            Config config = Config.parseString(configData);
+            Validator validator = new MockValidator();
+            ConfigBuilder builder = new ConfigBuilder(validator);
+            builder.parseString(configData);
+            Config config = builder.getConfig();
             fail("Expected a duplicate target ValidationException to be thrown");
         } catch (ValidationException e) {
             assertTrue(
@@ -85,11 +91,24 @@ public class ConfigTest extends TestCase {
         t2.deleteOnExit();
 
         try {
-            Config config = Config.parseString(configData);
+            ConfigBuilder builder = new ConfigBuilder();
+            builder.parseString(configData);
+            Config config = builder.getConfig();
             fail("Expected a duplicate slot/shelf ValidationException to be thrown");
         } catch (ValidationException e) {
             assertTrue(e.getMessage(),
                 e.getMessage().matches("^Shelf.*slot.*already been specified"));
+        }
+    }
+
+    private class MockValidator extends Validator {
+        public MockValidator() {
+            super();
+        }
+
+        @Override
+        public void validateDevice(Device device) throws ValidationException {
+            // Don't validate actual target filesystem existance.
         }
     }
 }

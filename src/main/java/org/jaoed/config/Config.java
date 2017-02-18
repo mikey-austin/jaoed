@@ -1,14 +1,10 @@
 package org.jaoed.config;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.Collection;
 import java.util.ArrayList;
-
-import main.antlr4.org.jaoed.*;
-import org.antlr.v4.runtime.*;
 
 public class Config {
     private List<Device> devices;
@@ -21,48 +17,6 @@ public class Config {
         interfaces = new HashMap<String, Interface>();
         loggers = new HashMap<String, Logger>();
         acls = new HashMap<String, Acl>();
-    }
-
-    public static Config parseString(String data)
-        throws IOException, ValidationException {
-
-        return parseString(data, true);
-    }
-
-    public static Config parseString(String data, boolean validate)
-        throws IOException, ValidationException {
-
-        CharStream stream = (CharStream) new ANTLRInputStream(data);
-        return parseInputStream(stream, validate);
-    }
-
-    public static Config parseFile(String fileName)
-        throws IOException, ValidationException {
-
-        return parseFile(fileName, true);
-    }
-
-    public static Config parseFile(String fileName, boolean validate)
-        throws IOException, ValidationException {
-
-        CharStream stream = (CharStream) new ANTLRFileStream(fileName);
-        return parseInputStream(stream, validate);
-    }
-
-    public static Config parseInputStream(CharStream stream, boolean validate)
-        throws IOException, ValidationException {
-
-        ConfigLexer lexer = new ConfigLexer(stream);
-        TokenStream tokenStream = new CommonTokenStream(lexer);
-        ConfigParser parser = new ConfigParser(tokenStream);
-        ConfigBuilder builder = new ConfigBuilder();
-
-        // Start the parser.
-        parser.addParseListener(builder);
-        parser.config();
-
-        // Collect the built configuration.
-        return builder.getConfig(validate);
     }
 
     public List<Device> getDevices() {
@@ -97,9 +51,7 @@ public class Config {
         acls.put(acl.getName(), acl);
     }
 
-    public void validate() throws ValidationException {
-        Validator validator = new Validator();
-
+    public void validate(Validator validator) throws ValidationException {
         for (Logger logger : loggers.values())
             logger.acceptVisitor(validator);
         for (Acl acl : acls.values())
