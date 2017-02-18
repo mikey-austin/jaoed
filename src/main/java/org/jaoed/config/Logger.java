@@ -30,11 +30,6 @@ public class Logger implements Section {
         return Level.INFO;
     }
 
-    public void validate() throws ValidationException {
-        if (name == null)
-            throw new ValidationException("Logger name required");
-    }
-
     public enum Level {
         INFO,
         DEBUG,

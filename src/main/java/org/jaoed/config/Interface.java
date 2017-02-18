@@ -68,11 +68,6 @@ public class Interface implements Section {
         return out;
     }
 
-    public void validate() throws ValidationException {
-        if (name == null)
-            throw new ValidationException("Interface name required");
-    }
-
     public class Mtu {
         private int mtu;
         private boolean auto;

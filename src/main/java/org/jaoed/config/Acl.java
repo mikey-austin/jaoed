@@ -79,11 +79,6 @@ public class Acl implements Section {
         REJECT
     }
 
-    public void validate() throws ValidationException {
-        if (name == null)
-            throw new ValidationException("Acl name required");
-    }
-
     @Override
     public String toString() {
         String out = "Acl<" + name + ">:\n"

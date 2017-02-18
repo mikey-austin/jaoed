@@ -1,8 +1,11 @@
 package org.jaoed.config;
 
 import java.util.HashMap;
+import java.nio.file.Path;
+import java.nio.file.Files;
+import java.nio.file.FileSystems;
 
-class Validator implements ConfigVisitor {
+public class Validator implements ConfigVisitor {
     private HashMap<String, Device> targets;
     private HashMap<Long, Device> targetShelfSlots;
     private ValidationException exception;
@@ -18,9 +21,29 @@ class Validator implements ConfigVisitor {
             throw exception;
     }
 
+    public void validateDevice(Device device) throws ValidationException {
+        String target = device.getTarget();
+
+        if (target == null)
+            throw new ValidationException("Device target required");
+
+        if (device.getSlot() < 0 || device.getShelf() < 0)
+            throw new ValidationException("Device slot/shelf must be >= 0");
+
+        Path targetPath = FileSystems.getDefault().getPath(target);
+        if (!targetPath.isAbsolute())
+            throw new ValidationException("Device target path must be absolute");
+
+        if (!Files.isReadable(targetPath))
+            throw new ValidationException("Device target path not readable");
+
+        if (!Files.isWritable(targetPath))
+            throw new ValidationException("Device target path not writable");
+    }
+
     public void visitDevice(Device device) {
         try {
-            device.validate();
+            validateDevice(device);
         } catch (ValidationException e) {
             exception = e;
         }
@@ -50,7 +73,8 @@ class Validator implements ConfigVisitor {
 
     public void visitInterface(Interface iface) {
         try {
-            iface.validate();
+            if (iface.getName() == null)
+                throw new ValidationException("Interface name required");
         } catch (ValidationException e) {
             exception = e;
         }
@@ -58,7 +82,8 @@ class Validator implements ConfigVisitor {
 
     public void visitLogger(Logger logger) {
         try {
-            logger.validate();
+            if (logger.getName() == null)
+                throw new ValidationException("Logger name required");
         } catch (ValidationException e) {
             exception = e;
         }
@@ -66,17 +91,12 @@ class Validator implements ConfigVisitor {
 
     public void visitAcl(Acl acl) {
         try {
-            acl.validate();
+            if (acl.getName() == null)
+                throw new ValidationException("Acl name required");
         } catch (ValidationException e) {
             exception = e;
         }
     }
 
-    public void visitDeviceAcl(Device.DeviceAcl acls) {
-        try {
-            acls.validate();
-        } catch (ValidationException e) {
-            exception = e;
-        }
-    }
+    public void visitDeviceAcl(Device.DeviceAcl acls) {}
 }

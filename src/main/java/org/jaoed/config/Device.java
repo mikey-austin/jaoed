@@ -1,9 +1,6 @@
 package org.jaoed.config;
 
 import java.util.List;
-import java.nio.file.Path;
-import java.nio.file.Files;
-import java.nio.file.FileSystems;
 
 import org.jaoed.config.ConfigVisitor;
 import org.jaoed.config.Section;
@@ -25,6 +22,8 @@ public class Device implements Section {
     public Device() {
         writeCache = false;
         broadcast = false;
+        slot = 0;
+        shelf = 0;
     }
 
     public int getShelf() {
@@ -124,21 +123,6 @@ public class Device implements Section {
         return out;
     }
 
-    public void validate() throws ValidationException {
-        if (target == null)
-            throw new ValidationException("Device target required");
-
-        Path targetPath = FileSystems.getDefault().getPath(target);
-        if (!targetPath.isAbsolute())
-            throw new ValidationException("Device target path must be absolute");
-
-        if (!Files.isReadable(targetPath))
-            throw new ValidationException("Device target path not readable");
-
-        if (!Files.isWritable(targetPath))
-            throw new ValidationException("Device target path not writable");
-    }
-
     public static class DeviceAcl implements Section {
         private Acl cfgRead;
         private Acl cfgSet;
@@ -182,8 +166,6 @@ public class Device implements Section {
         public void acceptVisitor(ConfigVisitor visitor) {
             visitor.visitDeviceAcl(this);
         }
-
-        public void validate() throws ValidationException {}
 
         @Override
         public String toString() {
