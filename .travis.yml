@@ -1,6 +1,6 @@
 language: java
 before_install:
     - sudo apt-get update
-    - sudo apt-get install libpcap
+    - sudo apt-get install libpcap-dev
 after_success:
   - mvn clean test jacoco:report coveralls:report
