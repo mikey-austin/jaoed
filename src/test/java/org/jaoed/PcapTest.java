@@ -13,6 +13,9 @@ import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.EthernetPacket;
+import org.pcap4j.packet.IllegalRawDataException;
+
+import org.jaoed.pcap4j.AoeFrame;
 
 public class PcapTest extends TestCase {
 
@@ -24,7 +27,9 @@ public class PcapTest extends TestCase {
         return new TestSuite(PcapTest.class);
     }
 
-    public void testPcapReader() throws PcapNativeException, NotOpenException {
+    public void testPcapReader()
+        throws PcapNativeException, NotOpenException, IllegalRawDataException {
+
         String file = getClass()
             .getClassLoader()
             .getResource("sampleAoeFrame.pcap")
@@ -47,6 +52,10 @@ public class PcapTest extends TestCase {
                 // TODO: make an AoE packet so we can call methods on it...
                 Packet payload = packet.getPayload();
                 assertNotNull(payload);
+                byte[] rawPayload = payload.getRawData();
+                AoeFrame aoeFrame = AoeFrame.newPacket(
+                    rawPayload, 0, rawPayload.length);
+                assertNotNull(aoeFrame);
             } catch (TimeoutException e) {
             } catch (EOFException e) {
                 break;
