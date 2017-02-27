@@ -17,6 +17,7 @@ import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.IllegalRawDataException;
 
 import org.jaoed.pcap4j.AoeFrame;
+import org.jaoed.pcap4j.namednumber.*;
 
 public class PcapTest extends TestCase {
 
@@ -50,7 +51,6 @@ public class PcapTest extends TestCase {
                 assertEquals("de:ad:be:ef:00:02", ethHeader.getSrcAddr().toString());
                 assertEquals("de:ad:be:ef:00:01", ethHeader.getDstAddr().toString());
 
-                // TODO: make an AoE packet so we can call methods on it...
                 Packet payload = packet.getPayload();
                 assertNotNull(payload);
                 byte[] rawPayload = payload.getRawData();
@@ -75,5 +75,37 @@ public class PcapTest extends TestCase {
         }
 
         handle.close();
+    }
+
+    public void testAoeFrameBuilder() throws IllegalRawDataException {
+
+        AoeFrame.Builder builder = new AoeFrame.Builder();
+
+        builder.version((byte) 1)
+            .responseFlag(true)
+            .responseErrorFlag(true)
+            .error((byte) 1)
+            .majorNumber((short) 222)
+            .minorNumber((byte) 33)
+            .command((byte) 3)
+            .tag(new byte[] { 0x11, 0x22, 0x33, 0x44 });
+
+        AoeFrame aoeFrame = builder.build();
+        assertNotNull(aoeFrame);
+
+        // Now parse the built packet.
+        byte[] rawPacket = aoeFrame.getRawData();
+        aoeFrame = AoeFrame.newPacket(rawPacket, 0, rawPacket.length);
+        assertNotNull(aoeFrame);
+
+        AoeFrame.AoeHeader header = aoeFrame.getHeader();
+        assertEquals(1, header.getVersion());
+        assertEquals(true, header.getResponseFlag());
+        assertEquals(true, header.getResponseErrorFlag());
+        assertEquals(222, header.getMajorNumber());
+        assertEquals(33, header.getMinorNumber());
+        assertEquals(AoeCommand.RESERVE_RELEASE, header.getCommand());
+        assertEquals(AoeError.CMD_UNKNOWN, header.getError());
+        assertEquals("11223344", ByteArrays.toHexString(header.getTag(), ""));
     }
 }

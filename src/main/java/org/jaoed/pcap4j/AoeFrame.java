@@ -94,6 +94,10 @@ public final class AoeFrame extends AbstractPacket {
             return this;
         }
 
+        public Builder error(byte error) {
+            return error(AoeError.getInstance(error));
+        }
+
         public Builder error(AoeError error) {
             this.error = error;
             return this;
@@ -107,6 +111,10 @@ public final class AoeFrame extends AbstractPacket {
         public Builder minorNumber(byte minorNumber) {
             this.minorNumber = minorNumber;
             return this;
+        }
+
+        public Builder command(byte command) {
+            return command(AoeCommand.getInstance(command));
         }
 
         public Builder command(AoeCommand command) {
