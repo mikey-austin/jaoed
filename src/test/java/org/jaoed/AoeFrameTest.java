@@ -16,17 +16,17 @@ import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.IllegalRawDataException;
 
-import org.jaoed.pcap4j.AoeFrame;
-import org.jaoed.pcap4j.namednumber.*;
+import org.jaoed.packet.AoeFrame;
+import org.jaoed.packet.namednumber.*;
 
-public class PcapTest extends TestCase {
+public class AoeFrameTest extends TestCase {
 
-    public PcapTest(String testName) {
+    public AoeFrameTest(String testName) {
         super(testName);
     }
 
     public static Test suite() {
-        return new TestSuite(PcapTest.class);
+        return new TestSuite(AoeFrameTest.class);
     }
 
     public void testPcapReader()

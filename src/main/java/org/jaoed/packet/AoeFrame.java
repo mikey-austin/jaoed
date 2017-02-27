@@ -1,4 +1,4 @@
-package org.jaoed.pcap4j;
+package org.jaoed.packet;
 
 import static org.pcap4j.util.ByteArrays.*;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import org.pcap4j.util.MacAddress;
 import org.pcap4j.packet.AbstractPacket;
 
 import org.pcap4j.packet.IllegalRawDataException;
-import org.jaoed.pcap4j.namednumber.*;
+import org.jaoed.packet.namednumber.*;
 
 public final class AoeFrame extends AbstractPacket {
     private final AoeHeader header;

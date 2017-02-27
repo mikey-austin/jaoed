@@ -1,4 +1,4 @@
-package org.jaoed.pcap4j.namednumber;
+package org.jaoed.packet.namednumber;
 
 import org.pcap4j.packet.namednumber.NamedNumber;
 
