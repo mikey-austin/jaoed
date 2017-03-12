@@ -11,12 +11,6 @@ import main.antlr4.org.jaoed.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-import org.jaoed.config.Config;
-import org.jaoed.config.Validator;
-import org.jaoed.config.Device;
-import org.jaoed.config.Interface;
-import org.jaoed.config.Logger;
-
 public class ConfigBuilder extends ConfigBaseListener {
     private Config config;
     private HashMap<String, Logger> loggerTab;

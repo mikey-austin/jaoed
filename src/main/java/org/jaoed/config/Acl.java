@@ -3,10 +3,6 @@ package org.jaoed.config;
 import java.util.List;
 import java.util.LinkedList;
 
-import org.jaoed.config.ConfigVisitor;
-import org.jaoed.config.Section;
-import org.jaoed.config.Logger;
-
 public class Acl implements Section {
     private String name;
     private Policy policy;

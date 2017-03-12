@@ -1,11 +1,5 @@
 package org.jaoed.config;
 
-import java.util.List;
-
-import org.jaoed.config.ConfigVisitor;
-import org.jaoed.config.Section;
-import org.jaoed.config.Logger;
-
 public class Interface implements Section {
     private String name;
     private Mtu mtu;
@@ -16,6 +10,7 @@ public class Interface implements Section {
         logLevel = Logger.Level.INFO;
     }
 
+    @Override
     public void acceptVisitor(ConfigVisitor visitor) {
         visitor.visitInterface(this);
     }

@@ -5,8 +5,11 @@ import java.util.Map;
 import java.util.List;
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Iterator;
+import java.lang.Iterable;
 
-public class Config {
+public class Config implements Iterable<Section> {
     private List<Device> devices;
     private Map<String, Interface> interfaces;
     private Map<String, Logger> loggers;
@@ -52,19 +55,28 @@ public class Config {
     }
 
     public void validate(Validator validator) throws ValidationException {
+        for (Section section : this)
+            section.acceptVisitor(validator);
+        validator.validate();
+    }
+
+    @Override
+    public Iterator<Section> iterator() {
+        List<Section> sections = new LinkedList<>();
+
         for (Logger logger : loggers.values())
-            logger.acceptVisitor(validator);
+            sections.add(logger);
         for (Acl acl : acls.values())
-            acl.acceptVisitor(validator);
+            sections.add(acl);
         for (Interface iface : interfaces.values())
-            iface.acceptVisitor(validator);
+            sections.add(iface);
         for (Device device : devices) {
-            device.acceptVisitor(validator);
+            sections.add(device);
             if (device.getAcls() != null)
-                device.getAcls().acceptVisitor(validator);
+                sections.add(device.getAcls());
         }
 
-        validator.validate();
+        return sections.iterator();
     }
 
     @Override

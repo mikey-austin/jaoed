@@ -2,12 +2,6 @@ package org.jaoed.config;
 
 import java.util.List;
 
-import org.jaoed.config.ConfigVisitor;
-import org.jaoed.config.Section;
-import org.jaoed.config.Acl;
-import org.jaoed.config.Interface;
-import org.jaoed.config.Logger;
-
 public class Device implements Section {
     private int shelf;
     private int slot;
