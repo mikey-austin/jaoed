@@ -49,6 +49,10 @@ public class DeviceTarget implements PacketProcessor, Runnable {
         }
     }
 
+    public void stop() {
+        this.running = false;
+    }
+
     @Override
     public boolean enqueue(EthernetPacket.EthernetHeader header, AoeFrame frame) {
         return inputQueue.offer(
