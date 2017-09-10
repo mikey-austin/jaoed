@@ -11,8 +11,8 @@ public class Validator implements ConfigVisitor {
     private ValidationException exception;
 
     public Validator() {
-        targets = new HashMap<String, Device>();
-        targetShelfSlots = new HashMap<Long, Device>();
+        targets = new HashMap<>();
+        targetShelfSlots = new HashMap<>();
     }
 
     public void validate() throws ValidationException {
@@ -41,6 +41,7 @@ public class Validator implements ConfigVisitor {
             throw new ValidationException("Device target path not writable");
     }
 
+    @Override
     public void visitDevice(Device device) {
         try {
             validateDevice(device);
@@ -71,6 +72,7 @@ public class Validator implements ConfigVisitor {
         }
     }
 
+    @Override
     public void visitInterface(Interface iface) {
         try {
             if (iface.getName() == null)
@@ -80,6 +82,7 @@ public class Validator implements ConfigVisitor {
         }
     }
 
+    @Override
     public void visitLogger(Logger logger) {
         try {
             if (logger.getName() == null)
@@ -89,6 +92,7 @@ public class Validator implements ConfigVisitor {
         }
     }
 
+    @Override
     public void visitAcl(Acl acl) {
         try {
             if (acl.getName() == null)
@@ -98,5 +102,6 @@ public class Validator implements ConfigVisitor {
         }
     }
 
+    @Override
     public void visitDeviceAcl(Device.DeviceAcl acls) {}
 }

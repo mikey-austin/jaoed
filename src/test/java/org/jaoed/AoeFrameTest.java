@@ -51,7 +51,7 @@ public class AoeFrameTest extends TestCase {
                 assertEquals("de:ad:be:ef:00:02", ethHeader.getSrcAddr().toString());
                 assertEquals("de:ad:be:ef:00:01", ethHeader.getDstAddr().toString());
 
-                Packet payload = packet.getPayload();
+                Packet payload = frame.getPayload();
                 assertNotNull(payload);
                 byte[] rawPayload = payload.getRawData();
                 AoeFrame aoeFrame = AoeFrame.newPacket(

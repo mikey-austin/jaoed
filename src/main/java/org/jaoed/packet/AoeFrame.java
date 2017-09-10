@@ -1,24 +1,29 @@
 package org.jaoed.packet;
 
-import static org.pcap4j.util.ByteArrays.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.pcap4j.packet.AbstractPacket;
+import org.pcap4j.packet.IllegalRawDataException;
+import org.pcap4j.packet.Packet;
 import org.pcap4j.util.ByteArrays;
 import org.pcap4j.util.MacAddress;
-import org.pcap4j.packet.AbstractPacket;
+import static org.pcap4j.util.ByteArrays.*;
 
-import org.pcap4j.packet.IllegalRawDataException;
 import org.jaoed.packet.namednumber.*;
 
 public final class AoeFrame extends AbstractPacket {
     private final AoeHeader header;
 
+    public static AoeFrame newPacket(Packet payload) throws IllegalRawDataException {
+        return newPacket(payload.getRawData(), 0, payload.getRawData().length);
+    }
+
     public static AoeFrame newPacket(byte[] rawData, int offset, int length)
         throws IllegalRawDataException {
 
         ByteArrays.validateBounds(rawData, offset, length);
-
         return new AoeFrame(rawData, offset, length);
     }
 
@@ -334,7 +339,6 @@ public final class AoeFrame extends AbstractPacket {
         @Override
         protected int calcHashCode() {
             int result = 17;
-
             result = 31 * result + version;
             result = 31 * result + (responseFlag ? 1 : 0);
             result = 31 * result + (responseErrorFlag ? 1 : 0);
@@ -343,7 +347,6 @@ public final class AoeFrame extends AbstractPacket {
             result = 31 * result + minorNumber;
             result = 31 * result + command.hashCode();
             result = 31 * result + tag.hashCode();
-
             return result;
         }
     }
