@@ -39,6 +39,7 @@ public class InterfaceListenerTest extends TestCase {
         Map<EthernetPacket.EthernetHeader, AoeFrame> captured = new HashMap<>();
         PacketProcessor processor = (header, frame) -> {
             captured.put(header, frame);
+            return true;
         };
 
         PcapHandle handle = Pcaps.openOffline(file);
