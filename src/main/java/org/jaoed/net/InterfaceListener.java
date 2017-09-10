@@ -1,9 +1,10 @@
 package org.jaoed.net;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Optional;
+import java.io.EOFException;
 import java.lang.Runnable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.packet.Packet;
@@ -37,16 +38,17 @@ public class InterfaceListener implements Runnable {
     }
 
     public void run() {
+        running = true;
         while (running) {
             try {
                 EthernetPacket packet = Optional
-                    .ofNullable(handle.getNextPacket())
+                    .ofNullable(handle.getNextPacketEx())
                     .map(p -> p.get(EthernetPacket.class))
                     .orElseThrow(() -> new Exception("received an invalid frame"));
 
                 EthernetPacket.EthernetHeader header = packet.getHeader();
-                AoeFrame aoeFrame = AoeFrame.newPacket(packet);
-                LOG.trace("received {} frame at {}: {}; {}",
+                AoeFrame aoeFrame = AoeFrame.newPacket(packet.getPayload());
+                LOG.trace("received {} frame at {}: {} {}",
                     handle, handle.getTimestamp(), header, aoeFrame);
 
                 // Evaluate ACLs, whether to drop the packet or not.
@@ -56,6 +58,9 @@ public class InterfaceListener implements Runnable {
                 } else {
                     throw new Exception("no processor for " + header.getDstAddr().toString());
                 }
+            } catch (EOFException e) {
+                LOG.info("received EOF in {} listener", handle);
+                stop();
             } catch (Exception e) {
                 LOG.error("could not process {} packet", handle, e);
             }

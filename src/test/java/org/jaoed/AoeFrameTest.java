@@ -1,11 +1,12 @@
 package org.jaoed;
 
+import java.io.EOFException;
+import java.util.concurrent.TimeoutException;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import java.io.EOFException;
-import java.util.concurrent.TimeoutException;
 import org.pcap4j.util.ByteArrays;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
@@ -16,10 +17,14 @@ import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.IllegalRawDataException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.namednumber.*;
 
 public class AoeFrameTest extends TestCase {
+    private static final Logger LOG = LoggerFactory.getLogger(AoeFrameTest.class);
 
     public AoeFrameTest(String testName) {
         super(testName);
@@ -57,6 +62,7 @@ public class AoeFrameTest extends TestCase {
                 AoeFrame aoeFrame = AoeFrame.newPacket(
                     rawPayload, 0, rawPayload.length);
                 assertNotNull(aoeFrame);
+                LOG.info("received aoe frame {}", aoeFrame);
 
                 // Test the header parsing.
                 AoeFrame.AoeHeader header = aoeFrame.getHeader();

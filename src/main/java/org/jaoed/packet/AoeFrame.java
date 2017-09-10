@@ -17,7 +17,8 @@ public final class AoeFrame extends AbstractPacket {
     private final AoeHeader header;
 
     public static AoeFrame newPacket(Packet payload) throws IllegalRawDataException {
-        return newPacket(payload.getRawData(), 0, payload.getRawData().length);
+        byte[] rawData = payload.getRawData();
+        return newPacket(rawData, 0, rawData.length);
     }
 
     public static AoeFrame newPacket(byte[] rawData, int offset, int length)
