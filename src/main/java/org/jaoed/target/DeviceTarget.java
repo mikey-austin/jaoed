@@ -34,6 +34,11 @@ public class DeviceTarget implements PacketProcessor, Runnable {
     }
 
     @Override
+    public String toString() {
+        return deviceConfig.getTarget();
+    }
+
+    @Override
     public void run() {
         this.running = true;
         while (running) {
