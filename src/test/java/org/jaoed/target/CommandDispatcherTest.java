@@ -41,5 +41,11 @@ public class CommandDispatcherTest {
             .build();
         dispatcher.makeCommand(null, frame2);
         assertEquals("called next", results.get("second"));
+
+        // Test non-existant command.
+        AoeFrame frame3 = new AoeFrame.Builder()
+            .command(AoeCommand.RESERVE_RELEASE)
+            .build();
+        assertNull(dispatcher.makeCommand(null, frame3));
     }
 }

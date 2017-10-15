@@ -24,7 +24,7 @@ public class CommandDispatcher implements CommandFactory {
     public static Builder newBuilder() {
         return new Builder();
     }
-    
+
     @Override
     public TargetCommand makeCommand(EthernetPacket.EthernetHeader header, AoeFrame frame) {
         AoeCommand command = frame.getHeader().getCommand();
