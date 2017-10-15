@@ -88,7 +88,6 @@
           <excludes>
             <exclude>**/antlr4/org/jaoed/*</exclude>
           </excludes>
-          <outputDirectory>target/jacoco-report</outputDirectory>
         </configuration>
       </plugin>
 
