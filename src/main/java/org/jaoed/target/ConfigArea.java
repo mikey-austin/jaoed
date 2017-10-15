@@ -8,17 +8,13 @@ import org.slf4j.LoggerFactory;
 public class ConfigArea {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigArea.class);
 
-    private final DeviceTarget target;
     private byte[] config;
 
-    public ConfigArea(DeviceTarget target) {
-        this.target = target;
+    public ConfigArea() {
         this.config = null;
     }
 
     public void setConfig(byte[] bytes) {
-        LOG.info("setting config string of {} bytes for target {}",
-                  target, bytes.length);
         this.config = Arrays.copyOf(bytes, bytes.length);
     }
 

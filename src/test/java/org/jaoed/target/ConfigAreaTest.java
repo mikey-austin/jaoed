@@ -12,13 +12,9 @@ import org.junit.runner.RunWith;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigAreaTest {
-    @Mock
-    DeviceTarget target;
-
     @Test
     public void testConfigArea() {
-        when(target.toString()).thenReturn("mock-target");
-        ConfigArea area = new ConfigArea(target);
+        ConfigArea area = new ConfigArea();
         assertTrue(area.isEmpty());
 
         byte[] bytes = new byte[] { 'h', 'e', 'l', 'l', 'o' };

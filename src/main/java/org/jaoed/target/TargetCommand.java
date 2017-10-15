@@ -1,5 +1,5 @@
 package org.jaoed.target;
 
 public interface TargetCommand {
-    public TargetResponse execute();
+    public TargetResponse execute(DeviceTarget target);
 }

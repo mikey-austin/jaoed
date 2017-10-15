@@ -22,6 +22,7 @@ public class DeviceTarget implements PacketProcessor, Runnable {
     private final CommandFactory commandFactory;
     private final Device deviceConfig;
     private final int pollInterval;
+    private final ConfigArea configArea;
     private volatile boolean running;
 
     private DeviceTarget(Builder builder) {
@@ -31,6 +32,7 @@ public class DeviceTarget implements PacketProcessor, Runnable {
         this.commandFactory = builder.commandFactory;
         this.pollInterval = builder.pollInterval;
         this.running = false;
+        this.configArea = builder.configArea;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class DeviceTarget implements PacketProcessor, Runnable {
                 TargetCommand command = inputQueue.poll(pollInterval, TimeUnit.MILLISECONDS);
                 if (command != null) {
                     responseProcessor.enqueue(
-                        command.execute());
+                        command.execute(this));
                 }
             } catch (Exception e) {
                 LOG.error("error executing command in {} target", deviceConfig.getTarget());
@@ -74,6 +76,7 @@ public class DeviceTarget implements PacketProcessor, Runnable {
         private ResponseProcessor responseProcessor;
         private Device deviceConfig;
         private CommandFactory commandFactory;
+        private ConfigArea configArea;
 
         private Builder() {
             this.pollInterval = 1_000;
@@ -81,6 +84,7 @@ public class DeviceTarget implements PacketProcessor, Runnable {
             this.responseProcessor = null;
             this.deviceConfig = null;
             this.commandFactory = null;
+            this.configArea = new ConfigArea();
         }
 
         public Builder setResponseProcessor(ResponseProcessor responseProcessor) {
@@ -105,6 +109,11 @@ public class DeviceTarget implements PacketProcessor, Runnable {
 
         public Builder setCommandFactory(CommandFactory commandFactory) {
             this.commandFactory = commandFactory;
+            return this;
+        }
+
+        public Builder setConfigArea(ConfigArea configArea) {
+            this.configArea = configArea;
             return this;
         }
 
