@@ -15,6 +15,8 @@ public class ConfigAreaTest {
     @Test
     public void testConfigArea() {
         ConfigArea area = new DeviceConfigArea();
+        assertTrue(area.isCompleteMatch(new byte[] {}));
+        assertTrue(area.isPrefixMatch(new byte[] {}));
         assertTrue(area.isEmpty());
 
         byte[] bytes = new byte[] { 'h', 'e', 'l', 'l', 'o' };
