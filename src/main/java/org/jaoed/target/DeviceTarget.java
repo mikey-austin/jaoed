@@ -84,7 +84,7 @@ public class DeviceTarget implements PacketProcessor, Runnable {
             this.responseProcessor = null;
             this.deviceConfig = null;
             this.commandFactory = null;
-            this.configArea = new ConfigArea();
+            this.configArea = null;
         }
 
         public Builder setResponseProcessor(ResponseProcessor responseProcessor) {
@@ -126,6 +126,9 @@ public class DeviceTarget implements PacketProcessor, Runnable {
             }
             if (commandFactory == null) {
                 throw new Exception("missing command factory");
+            }
+            if (configArea == null) {
+                throw new Exception("missing device config area");
             }
             return new DeviceTarget(this);
         }
