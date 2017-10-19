@@ -1,9 +1,10 @@
 package org.jaoed.packet.namednumber;
 
-import org.pcap4j.packet.namednumber.NamedNumber;
-
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
+import org.pcap4j.packet.namednumber.NamedNumber;
 
 public final class AoeCommand extends NamedNumber<Byte, AoeCommand> {
 
@@ -33,12 +34,8 @@ public final class AoeCommand extends NamedNumber<Byte, AoeCommand> {
         super(value, name);
     }
 
-    public static AoeCommand getInstance(Byte value) {
-        if (registry.containsKey(value)) {
-            return registry.get(value);
-        } else {
-            return new AoeCommand(value, "unknown");
-        }
+    public static Optional<AoeCommand> getInstance(Byte value) {
+        return Optional.ofNullable(registry.get(value));
     }
 
     @Override

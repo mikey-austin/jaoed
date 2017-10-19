@@ -120,7 +120,8 @@ public final class AoeFrame extends AbstractPacket {
         }
 
         public Builder command(byte command) {
-            return command(AoeCommand.getInstance(command));
+            AoeCommand.getInstance(command).ifPresent(this::command);
+            return this;
         }
 
         public Builder command(AoeCommand command) {
@@ -196,8 +197,10 @@ public final class AoeFrame extends AbstractPacket {
                 ByteArrays.getByte(rawData, ERROR_OFFSET + offset));
             this.majorNumber = ByteArrays.getShort(rawData, MAJOR_NUMBER_OFFSET + offset);
             this.minorNumber = ByteArrays.getByte(rawData, MINOR_NUMBER_OFFSET + offset);
-            this.command = AoeCommand.getInstance(
-                ByteArrays.getByte(rawData, COMMAND_OFFSET + offset));
+            AoeCommand
+                .getInstance(
+                    ByteArrays.getByte(rawData, COMMAND_OFFSET + offset))
+                .ifPresent(namedCommand -> this.command = namedCommand);
             this.tag = ByteArrays.getSubArray(rawData, TAG_OFFSET + offset, TAG_SIZE);
         }
 
