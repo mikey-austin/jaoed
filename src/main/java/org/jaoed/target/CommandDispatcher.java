@@ -8,6 +8,7 @@ import org.pcap4j.packet.EthernetPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.namednumber.AoeCommand;
 
@@ -26,8 +27,8 @@ public class CommandDispatcher implements CommandFactory {
     }
 
     @Override
-    public TargetCommand makeCommand(EthernetPacket.EthernetHeader header, AoeFrame frame) {
-        AoeCommand command = frame.getHeader().getCommand();
+    public TargetCommand makeCommand(RequestContext ctx) {
+        AoeCommand command = ctx.getAoeFrame().getHeader().getCommand();
         if (!commandFactories.containsKey(command)) {
             LOG.warn("unknown command type ({}) requested", command);
             return null;
@@ -35,7 +36,7 @@ public class CommandDispatcher implements CommandFactory {
 
         return commandFactories
             .get(command)
-            .makeCommand(header, frame);
+            .makeCommand(ctx);
     }
 
     public static class Builder {

@@ -2,6 +2,7 @@ package org.jaoed.net;
 
 import java.lang.Thread;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -36,9 +37,9 @@ public class InterfaceListenerTest extends TestCase {
             .getFile();
         assertNotNull(file);
 
-        Map<EthernetPacket.EthernetHeader, AoeFrame> captured = new HashMap<>();
-        PacketProcessor processor = (header, frame) -> {
-            captured.put(header, frame);
+        LinkedList<RequestContext> captured = new LinkedList<>();
+        PacketProcessor processor = ctx -> {
+            captured.add(ctx);
             return true;
         };
 

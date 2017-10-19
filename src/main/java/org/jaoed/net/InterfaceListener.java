@@ -47,17 +47,16 @@ public class InterfaceListener implements Runnable {
                     .map(p -> p.get(EthernetPacket.class))
                     .orElseThrow(() -> new Exception("received an invalid frame"));
 
-                EthernetPacket.EthernetHeader header = packet.getHeader();
-                AoeFrame aoeFrame = AoeFrame.newPacket(packet.getPayload());
-                LOG.trace("received {} frame at {}: {} {}",
-                    handle, handle.getTimestamp(), header, aoeFrame);
+                RequestContext ctx = new RequestContext(packet);
+                LOG.trace("received {} frame at {}: {}",
+                    handle, handle.getTimestamp(), ctx);
 
                 // Evaluate ACLs, whether to drop the packet or not.
                 PacketProcessor processor;
-                if ((processor = processors.get(header.getDstAddr().toString())) != null) {
-                    processor.enqueue(header, aoeFrame);
+                if ((processor = processors.get(ctx.getDstAddr())) != null) {
+                    processor.enqueue(ctx);
                 } else {
-                    throw new Exception("no processor for " + header.getDstAddr().toString());
+                    throw new Exception("no processor for " + ctx.getDstAddr());
                 }
             } catch (EOFException e) {
                 LOG.info("received EOF in {} listener", handle);

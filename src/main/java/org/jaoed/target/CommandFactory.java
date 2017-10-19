@@ -1,9 +1,7 @@
 package org.jaoed.target;
 
-import org.pcap4j.packet.EthernetPacket;
-
-import org.jaoed.packet.AoeFrame;
+import org.jaoed.net.RequestContext;
 
 public interface CommandFactory {
-    public TargetCommand makeCommand(EthernetPacket.EthernetHeader header, AoeFrame frame);
+    public TargetCommand makeCommand(RequestContext ctx);
 }

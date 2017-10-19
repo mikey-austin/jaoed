@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jaoed.config.Device;
+import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.PacketProcessor;
 
@@ -61,9 +62,13 @@ public class DeviceTarget implements PacketProcessor, Runnable {
     }
 
     @Override
-    public boolean enqueue(EthernetPacket.EthernetHeader header, AoeFrame frame) {
+    public boolean enqueue(RequestContext ctx) {
         return inputQueue.offer(
-            commandFactory.makeCommand(header, frame));
+            commandFactory.makeCommand(ctx));
+    }
+
+    public ConfigArea getConfigArea() {
+        return configArea;
     }
 
     public static Builder newBuilder() {

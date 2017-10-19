@@ -1,3 +1,7 @@
 package org.jaoed.target;
 
-public interface TargetResponse {}
+import org.pcap4j.packet.EthernetPacket;
+
+public interface TargetResponse {
+    public EthernetPacket makeResponse();
+}

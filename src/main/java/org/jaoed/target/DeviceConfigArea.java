@@ -20,6 +20,11 @@ public class DeviceConfigArea implements ConfigArea {
     }
 
     @Override
+    public byte[] getConfig() {
+        return config;
+    }
+
+    @Override
     public boolean isEmpty() {
         return config == null;
     }
