@@ -84,11 +84,11 @@
             </goals>
           </execution>
           <execution>
-			<id>post-unit-test</id>
-			<phase>test</phase>
-			<goals>
-			  <goal>report</goal>
-			</goals>
+            <id>post-unit-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
           </execution>
         </executions>
         <configuration>
@@ -112,6 +112,30 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.1.1</version>
+        <executions>
+          <execution>
+            <id>extract-test-coverage</id>
+            <phase>test</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <inherited>false</inherited>
+          </execution>
+        </executions>
+        <configuration>
+          <executable>xsltproc</executable>
+          <arguments>
+            <argument>--novalid</argument>
+            <argument>${project.basedir}/src/test/xslt/coverage.xslt</argument>
+            <argument>${project.basedir}/target/site/jacoco/jacoco.xml</argument>
+          </arguments>
+        </configuration>
       </plugin>
 
       <plugin>
