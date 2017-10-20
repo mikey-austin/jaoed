@@ -23,15 +23,18 @@ import org.jaoed.target.TargetResponse;
 
 public class ConfigFactory implements CommandFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigFactory.class);
-    private static final Map<QueryConfigCommand, BiFunction<RequestContext, QueryConfig, TargetCommand>> factories;
 
-    static {
-        factories = new HashMap<>();
-        factories.put(QueryConfigCommand.READ_CONFIG, ConfigFactory::readConfig);
-        factories.put(QueryConfigCommand.TEST_FULL_MATCH, ConfigFactory::testFullMatch);
-        factories.put(QueryConfigCommand.TEST_PREFIX_MATCH, ConfigFactory::testPrefixMatch);
-        factories.put(QueryConfigCommand.SET_IF_EMPTY, ConfigFactory::setIfEmpty);
-        factories.put(QueryConfigCommand.SET_FORCE, ConfigFactory::setForce);
+    private final Map<QueryConfigCommand, BiFunction<RequestContext, QueryConfig, TargetCommand>> dispatch;
+    private final BiFunction<RequestContext, DeviceTarget, ResponseBuilder> responseBuilderFactory;
+
+    public ConfigFactory(BiFunction<RequestContext, DeviceTarget, ResponseBuilder> responseBuilderFactory) {
+        this.responseBuilderFactory = responseBuilderFactory;
+        this.dispatch = new HashMap<>();
+        this.dispatch.put(QueryConfigCommand.READ_CONFIG, this::readConfig);
+        this.dispatch.put(QueryConfigCommand.TEST_FULL_MATCH, this::testFullMatch);
+        this.dispatch.put(QueryConfigCommand.TEST_PREFIX_MATCH, this::testPrefixMatch);
+        this.dispatch.put(QueryConfigCommand.SET_IF_EMPTY, this::setIfEmpty);
+        this.dispatch.put(QueryConfigCommand.SET_FORCE, this::setForce);
     }
 
     @Override
@@ -41,7 +44,7 @@ public class ConfigFactory implements CommandFactory {
                 ctx.getAoeFrame().getPayload());
             return Optional
                 .ofNullable(
-                    factories.get(query.getHeader().getSubCommand()))
+                    dispatch.get(query.getHeader().getSubCommand()))
                 .orElseThrow(
                     () -> new IllegalArgumentException("no sub-command found"))
                 .apply(ctx, query);
@@ -49,14 +52,16 @@ public class ConfigFactory implements CommandFactory {
             LOG.error("could not make query config command", e);
         }
 
-        return target -> new ResponseBuilder(ctx, target).setError(AoeError.CMD_UNKNOWN);
+        return target -> responseBuilderFactory
+            .apply(ctx, target)
+            .setError(AoeError.CMD_UNKNOWN);
     }
 
-    public static TargetCommand readConfig(RequestContext ctx, QueryConfig query) {
+    public TargetCommand readConfig(RequestContext ctx, QueryConfig query) {
         return target -> {
             LOG.debug("reading config for device {}", target);
             ConfigArea configArea = target.getConfigArea();
-            ResponseBuilder response = new ResponseBuilder(ctx, target);
+            ResponseBuilder response = responseBuilderFactory.apply(ctx, target);
             if (!configArea.isEmpty()) {
                 response.setPayload(configArea.getConfig());
             }
@@ -64,13 +69,13 @@ public class ConfigFactory implements CommandFactory {
         };
     }
 
-    public static TargetCommand testFullMatch(RequestContext ctx, QueryConfig query) {
+    public TargetCommand testFullMatch(RequestContext ctx, QueryConfig query) {
         return target -> {
             ConfigArea configArea = target.getConfigArea();
             byte[] queryString = query.getPayload().getRawData();
             if (configArea.isCompleteMatch(queryString)) {
                 LOG.debug("full config string match for device {}", target);
-                ResponseBuilder response = new ResponseBuilder(ctx, target);
+                ResponseBuilder response = responseBuilderFactory.apply(ctx, target);
                 if (!configArea.isEmpty()) {
                     response.setPayload(configArea.getConfig());
                 }
@@ -82,13 +87,13 @@ public class ConfigFactory implements CommandFactory {
         };
     }
 
-    public static TargetCommand testPrefixMatch(RequestContext ctx, QueryConfig query) {
+    public TargetCommand testPrefixMatch(RequestContext ctx, QueryConfig query) {
         return target -> {
             ConfigArea configArea = target.getConfigArea();
             byte[] queryString = query.getPayload().getRawData();
             if (configArea.isPrefixMatch(queryString)) {
                 LOG.debug("prefix match for device {}", target);
-                ResponseBuilder response = new ResponseBuilder(ctx, target);
+                ResponseBuilder response = responseBuilderFactory.apply(ctx, target);
                 if (!configArea.isEmpty()) {
                     response.setPayload(configArea.getConfig());
                 }
@@ -100,30 +105,30 @@ public class ConfigFactory implements CommandFactory {
         };
     }
 
-    public static TargetCommand setIfEmpty(RequestContext ctx, QueryConfig query) {
+    public TargetCommand setIfEmpty(RequestContext ctx, QueryConfig query) {
         return target -> {
             ConfigArea configArea = target.getConfigArea();
             if (configArea.isEmpty()) {
                 byte[] toSet = query.getPayload().getRawData();
                 configArea.setConfig(toSet);
                 LOG.debug("setting config string for device {}", target);
-                return new ResponseBuilder(ctx, target)
+                return responseBuilderFactory.apply(ctx, target)
                     .setPayload(toSet);
             } else {
                 LOG.debug("refusing to overwrite config string for device {}", target);
-                return new ResponseBuilder(ctx, target)
+                return responseBuilderFactory.apply(ctx, target)
                     .setError(AoeError.CANNOT_SET_CONFIG);
             }
         };
     }
 
-    public static TargetCommand setForce(RequestContext ctx, QueryConfig query) {
+    public TargetCommand setForce(RequestContext ctx, QueryConfig query) {
         return target -> {
             ConfigArea configArea = target.getConfigArea();
             byte[] toSet = query.getPayload().getRawData();
             configArea.setConfig(toSet);
             LOG.debug("force setting config string for device {}", target);
-            return new ResponseBuilder(ctx, target)
+            return responseBuilderFactory.apply(ctx, target)
                 .setPayload(toSet);
         };
     }

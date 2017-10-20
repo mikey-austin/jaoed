@@ -7,6 +7,7 @@ import java.util.List;
 import org.pcap4j.packet.AbstractPacket;
 import org.pcap4j.packet.IllegalRawDataException;
 import org.pcap4j.packet.Packet;
+import org.pcap4j.packet.UnknownPacket;
 import org.pcap4j.util.ByteArrays;
 import org.pcap4j.util.MacAddress;
 import static org.pcap4j.util.ByteArrays.*;
@@ -15,6 +16,7 @@ import org.jaoed.packet.namednumber.*;
 
 public final class QueryConfig extends AbstractPacket {
     private final QueryConfigHeader header;
+    private final Packet payload;
 
     public static QueryConfig newPacket(Packet payload) throws IllegalRawDataException {
         byte[] rawData = payload.getRawData();
@@ -32,15 +34,37 @@ public final class QueryConfig extends AbstractPacket {
         throws IllegalRawDataException {
 
         this.header = new QueryConfigHeader(rawData, offset, length);
+
+        // We don't use packet factories, so just put the rest as an
+        // unknown packet.
+        int payloadOffset = offset + header.length();
+        int payloadLength = length - header.length();
+        if (payloadLength < 0) {
+            throw new IllegalRawDataException("invalid payload length");
+        } else if (payloadLength > 0) {
+            this.payload = new UnknownPacket.Builder()
+                .rawData(Arrays.copyOfRange(rawData, payloadOffset, payloadOffset + payloadLength))
+                .build();
+        } else {
+            this.payload = null;
+        }
     }
 
     private QueryConfig(Builder builder) {
         this.header = new QueryConfigHeader(builder);
+        this.payload = builder.payloadBuilder != null
+            ? builder.payloadBuilder.build()
+            : null;
     }
 
     @Override
     public QueryConfigHeader getHeader() {
         return header;
+    }
+
+    @Override
+    public Packet getPayload() {
+        return payload;
     }
 
     @Override
@@ -55,6 +79,7 @@ public final class QueryConfig extends AbstractPacket {
         private byte aoeProtocolVersion;
         private QueryConfigCommand subCommand;
         private short configStringLength;
+        private AbstractPacket.Builder payloadBuilder;
 
         public Builder() {}
 
@@ -106,6 +131,17 @@ public final class QueryConfig extends AbstractPacket {
         }
 
         @Override
+        public Builder payloadBuilder(AbstractPacket.Builder payloadBuilder) {
+            this.payloadBuilder = payloadBuilder;
+            return this;
+        }
+
+        @Override
+        public AbstractPacket.Builder getPayloadBuilder() {
+            return this.payloadBuilder;
+        }
+
+        @Override
         public QueryConfig build() {
             return new QueryConfig(this);
         }
@@ -129,12 +165,12 @@ public final class QueryConfig extends AbstractPacket {
         private static final int CONFIG_STR_LEN_OFFSET = AOE_CMD_OFFSET + AOE_CMD_SIZE;
         private static final int CONFIG_STR_LEN_SIZE = 2;
 
-        private short bufferCount;
-        private short firmwareVersion;
-        private byte sectorCount;
-        private byte aoeProtocolVersion;
+        private short bufferCount = 0;
+        private short firmwareVersion = 0;
+        private byte sectorCount = 0;
+        private byte aoeProtocolVersion = 0;
         private QueryConfigCommand subCommand;
-        private short configStringLength;
+        private short configStringLength = 0;
 
         private QueryConfigHeader(byte[] rawData, int offset, int length) throws IllegalRawDataException {
             if (length < QUERY_CONFIG_SIZE) {

@@ -13,7 +13,7 @@ import static org.pcap4j.util.ByteArrays.*;
 
 import org.jaoed.packet.namednumber.*;
 
-public final class AoeFrame extends AbstractPacket {
+public class AoeFrame extends AbstractPacket {
     private final AoeHeader header;
 
     public static AoeFrame newPacket(Packet payload) throws IllegalRawDataException {
