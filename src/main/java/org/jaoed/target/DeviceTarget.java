@@ -24,6 +24,9 @@ public class DeviceTarget implements PacketProcessor, Runnable {
     private final Device deviceConfig;
     private final int pollInterval;
     private final ConfigArea configArea;
+    private final short firmwareVersion;
+    private final byte sectorCount;
+
     private volatile boolean running;
 
     private DeviceTarget(Builder builder) {
@@ -34,6 +37,8 @@ public class DeviceTarget implements PacketProcessor, Runnable {
         this.pollInterval = builder.pollInterval;
         this.running = false;
         this.configArea = builder.configArea;
+        this.firmwareVersion = builder.firmwareVersion;
+        this.sectorCount = builder.sectorCount;
     }
 
     @Override
@@ -55,6 +60,18 @@ public class DeviceTarget implements PacketProcessor, Runnable {
                 LOG.error("error executing command in {} target", deviceConfig.getTarget());
             }
         }
+    }
+
+    public short getFirmwareVersion() {
+        return firmwareVersion;
+    }
+
+    public byte getSectorCount() {
+        return sectorCount;
+    }
+
+    public short getBufferCount() {
+        return (short) inputQueue.size();
     }
 
     public void stop() {
@@ -82,6 +99,8 @@ public class DeviceTarget implements PacketProcessor, Runnable {
         private Device deviceConfig;
         private CommandFactory commandFactory;
         private ConfigArea configArea;
+        private short firmwareVersion;
+        private byte sectorCount;
 
         private Builder() {
             this.pollInterval = 1_000;
@@ -90,6 +109,8 @@ public class DeviceTarget implements PacketProcessor, Runnable {
             this.deviceConfig = null;
             this.commandFactory = null;
             this.configArea = null;
+            this.sectorCount = 0;
+            this.firmwareVersion = 0;
         }
 
         public Builder setResponseProcessor(ResponseProcessor responseProcessor) {
@@ -119,6 +140,16 @@ public class DeviceTarget implements PacketProcessor, Runnable {
 
         public Builder setConfigArea(ConfigArea configArea) {
             this.configArea = configArea;
+            return this;
+        }
+
+        public Builder setFirmwareVersion(short firmwareVersion) {
+            this.firmwareVersion = firmwareVersion;
+            return this;
+        }
+
+        public Builder setSectorCount(byte sectorCount) {
+            this.sectorCount = sectorCount;
             return this;
         }
 

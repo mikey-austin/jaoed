@@ -17,6 +17,10 @@ public class RequestContext {
         return aoeFrame;
     }
 
+    public EthernetPacket getEthernetFrame() {
+        return requestFrame;
+    }
+
     public String getDstAddr() {
         return requestFrame.getHeader().getDstAddr().toString();
     }
