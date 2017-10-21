@@ -5,6 +5,7 @@ import java.lang.Runnable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.packet.Packet;
@@ -20,12 +21,20 @@ public class InterfaceListener implements Runnable {
 
     private final PcapHandle handle;
     private final Map<String, PacketProcessor> processors;
+    private final Consumer<Packet> sender;
     private volatile boolean running;
 
     public InterfaceListener(PcapHandle handle) {
         this.handle = handle;
         this.running = false;
         this.processors = new HashMap<>();
+        this.sender = packet -> {
+            try {
+                handle.sendPacket(packet);
+            } catch (Exception e) {
+                LOG.error("could not send packet via handle {}", handle, e);
+            }
+        };
     }
 
     public void stop() {
@@ -47,7 +56,7 @@ public class InterfaceListener implements Runnable {
                     .map(p -> p.get(EthernetPacket.class))
                     .orElseThrow(() -> new Exception("received an invalid frame"));
 
-                RequestContext ctx = new RequestContext(packet);
+                RequestContext ctx = new RequestContext(packet, sender);
                 LOG.trace("received {} frame at {}: {}",
                     handle, handle.getTimestamp(), ctx);
 

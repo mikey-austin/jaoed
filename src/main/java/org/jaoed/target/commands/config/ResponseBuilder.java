@@ -1,6 +1,7 @@
 package org.jaoed.target.commands.config;
 
 import org.pcap4j.packet.EthernetPacket;
+import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.UnknownPacket;
 import org.pcap4j.util.MacAddress;
 
@@ -43,7 +44,13 @@ public class ResponseBuilder implements TargetResponse {
     }
 
     @Override
-    public EthernetPacket makeResponse() {
+    public void sendResponse() {
+        // Build and send off the response.
+        ctx.getSender().accept(getResponse());
+    }
+
+    @Override
+    public Packet getResponse() {
         try {
             QueryConfig.Builder config = new QueryConfig.Builder()
                 .firmwareVersion(target.getFirmwareVersion())
