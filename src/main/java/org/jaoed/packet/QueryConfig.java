@@ -93,6 +93,8 @@ public final class QueryConfig extends AbstractPacket {
             QueryConfigCommand
                 .getInstance(header.subCommand.value())
                 .ifPresent(command -> this.subCommand = command);
+            if (packet.payload != null)
+                this.payloadBuilder = packet.payload.getBuilder();
         }
 
         public Builder bufferCount(short bufferCount) {

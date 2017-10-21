@@ -63,6 +63,11 @@ public class AoeFrame extends AbstractPacket {
     }
 
     @Override
+    public Packet getPayload() {
+        return payload;
+    }
+
+    @Override
     public Builder getBuilder() {
         return new Builder(this);
     }
@@ -93,6 +98,8 @@ public class AoeFrame extends AbstractPacket {
             this.minorNumber = packet.header.minorNumber;
             this.command = packet.header.command;
             this.tag = packet.header.tag;
+            if (packet.payload != null)
+                this.payloadBuilder = packet.payload.getBuilder();
         }
 
         public Builder version(byte version) {
@@ -299,7 +306,8 @@ public class AoeFrame extends AbstractPacket {
             versionFlags |= (reserved2Flag ? 0x08 : 0x00);
             rawFields.add(ByteArrays.toByteArray(versionFlags));
 
-            rawFields.add(ByteArrays.toByteArray(error.value()));
+            rawFields.add(
+                error != null ? ByteArrays.toByteArray(error.value()) : new byte[] { 0x0 });
             rawFields.add(ByteArrays.toByteArray(majorNumber));
             rawFields.add(ByteArrays.toByteArray(minorNumber));
             rawFields.add(ByteArrays.toByteArray(command.value()));

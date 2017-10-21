@@ -13,7 +13,6 @@ import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.QueryConfig;
 import org.jaoed.packet.namednumber.AoeError;
 import org.jaoed.packet.namednumber.QueryConfigCommand;
-import org.jaoed.target.ConfigArea;
 import org.jaoed.target.DeviceTarget;
 import org.jaoed.target.TargetCommand;
 import org.jaoed.target.TargetResponse;
@@ -46,15 +45,24 @@ public class ResponseBuilder implements TargetResponse {
     @Override
     public EthernetPacket makeResponse() {
         try {
-            QueryConfig.Builder config = QueryConfig
-                .newPacket(ctx.getAoeFrame().getPayload())
-                .getBuilder()
+            QueryConfig.Builder config = new QueryConfig.Builder()
                 .firmwareVersion(target.getFirmwareVersion())
                 .sectorCount(target.getSectorCount())
                 .bufferCount(target.getBufferCount())
-                .payloadBuilder(
-                    new UnknownPacket.Builder().rawData(payload))
                 .aoeProtocolVersion(AoeVersion.SUPPORTED);
+            if (payload != null) {
+                config
+                    .configStringLength((short) payload.length)
+                    .payloadBuilder(
+                        new UnknownPacket.Builder().rawData(payload));
+            }
+
+            if (ctx.getAoeFrame().getPayload() != null) {
+                QueryConfig requestConfig = QueryConfig.newPacket(
+                    ctx.getAoeFrame().getPayload());
+                config.subCommand(
+                    requestConfig.getHeader().getSubCommand());
+            }
 
             AoeFrame.Builder aoe = ctx
                 .getAoeFrame()
