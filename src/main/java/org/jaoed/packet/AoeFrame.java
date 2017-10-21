@@ -7,6 +7,7 @@ import java.util.List;
 import org.pcap4j.packet.AbstractPacket;
 import org.pcap4j.packet.IllegalRawDataException;
 import org.pcap4j.packet.Packet;
+import org.pcap4j.packet.UnknownPacket;
 import org.pcap4j.util.ByteArrays;
 import org.pcap4j.util.MacAddress;
 import static org.pcap4j.util.ByteArrays.*;
@@ -15,6 +16,7 @@ import org.jaoed.packet.namednumber.*;
 
 public class AoeFrame extends AbstractPacket {
     private final AoeHeader header;
+    private final Packet payload;
 
     public static AoeFrame newPacket(Packet payload) throws IllegalRawDataException {
         byte[] rawData = payload.getRawData();
@@ -32,10 +34,27 @@ public class AoeFrame extends AbstractPacket {
         throws IllegalRawDataException {
 
         this.header = new AoeHeader(rawData, offset, length);
+
+        // We don't use packet factories, so just put the rest as an
+        // unknown packet.
+        int payloadOffset = offset + header.length();
+        int payloadLength = length - header.length();
+        if (payloadLength < 0) {
+            throw new IllegalRawDataException("invalid payload length");
+        } else if (payloadLength > 0) {
+            this.payload = new UnknownPacket.Builder()
+                .rawData(Arrays.copyOfRange(rawData, payloadOffset, payloadOffset + payloadLength))
+                .build();
+        } else {
+            this.payload = null;
+        }
     }
 
     private AoeFrame(Builder builder) {
         this.header = new AoeHeader(builder);
+        this.payload = builder.payloadBuilder != null
+            ? builder.payloadBuilder.build()
+            : null;
     }
 
     @Override
@@ -59,6 +78,7 @@ public class AoeFrame extends AbstractPacket {
         private byte minorNumber;
         private AoeCommand command;
         private byte[] tag;
+        private AbstractPacket.Builder payloadBuilder;
 
         public Builder() {}
 
@@ -132,6 +152,17 @@ public class AoeFrame extends AbstractPacket {
         public Builder tag(byte[] tag) {
             this.tag = tag;
             return this;
+        }
+
+        @Override
+        public Builder payloadBuilder(AbstractPacket.Builder payloadBuilder) {
+            this.payloadBuilder = payloadBuilder;
+            return this;
+        }
+
+        @Override
+        public AbstractPacket.Builder getPayloadBuilder() {
+            return this.payloadBuilder;
         }
 
         @Override
