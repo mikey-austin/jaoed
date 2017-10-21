@@ -46,24 +46,21 @@ public class ResponseBuilder implements TargetResponse {
     @Override
     public EthernetPacket makeResponse() {
         try {
-            UnknownPacket.Builder inner = UnknownPacket
-                .newPacket(payload, 0, payload.length)
-                .getBuilder();
-
             QueryConfig.Builder config = QueryConfig
                 .newPacket(ctx.getAoeFrame().getPayload())
                 .getBuilder()
                 .firmwareVersion(target.getFirmwareVersion())
                 .sectorCount(target.getSectorCount())
                 .bufferCount(target.getBufferCount())
+                .payloadBuilder(
+                    new UnknownPacket.Builder().rawData(payload))
                 .aoeProtocolVersion(AoeVersion.SUPPORTED);
-            config.payloadBuilder(inner);
 
             AoeFrame.Builder aoe = ctx
                 .getAoeFrame()
                 .getBuilder()
-                .responseFlag(true);
-            aoe.payloadBuilder(config);
+                .responseFlag(true)
+                .payloadBuilder(config);
             if (error != null) {
                 aoe.error(error);
             }
