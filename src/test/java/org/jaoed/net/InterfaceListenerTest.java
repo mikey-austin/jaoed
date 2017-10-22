@@ -4,11 +4,16 @@ import java.lang.Thread;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.mockito.*;
+import org.mockito.runners.*;
+import static org.mockito.Mockito.*;
+
+import static org.junit.Assert.*;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.core.PcapHandle.TimestampPrecision;
@@ -19,17 +24,13 @@ import org.pcap4j.packet.EthernetPacket;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.namednumber.*;
 import org.jaoed.packet.PacketProcessor;
+import org.jaoed.packet.ProcessorRegistry;
 
-public class InterfaceListenerTest extends TestCase {
+@RunWith(MockitoJUnitRunner.class)
+public class InterfaceListenerTest {
+    @Mock ProcessorRegistry processorRegistry;
 
-    public InterfaceListenerTest(String testName) {
-        super(testName);
-    }
-
-    public static Test suite() {
-        return new TestSuite(InterfaceListenerTest.class);
-    }
-
+    @Test
     public void testInterfaceListener() throws Exception {
         String file = getClass()
             .getClassLoader()
@@ -42,10 +43,12 @@ public class InterfaceListenerTest extends TestCase {
             captured.add(ctx);
             return true;
         };
+        when(processorRegistry.lookup(any()))
+            .thenReturn(Optional.of(processor));
 
         PcapHandle handle = Pcaps.openOffline(file);
-        InterfaceListener listener = new InterfaceListener(handle)
-            .addProcessor("de:ad:be:ef:00:01", processor);
+        InterfaceListener listener = new InterfaceListener(
+            handle, processorRegistry);
 
         Thread thread = new Thread(listener);
         thread.run();

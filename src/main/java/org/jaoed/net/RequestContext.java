@@ -30,10 +30,6 @@ public class RequestContext {
         return requestFrame;
     }
 
-    public String getDstAddr() {
-        return requestFrame.getHeader().getDstAddr().toString();
-    }
-
     @Override
     public String toString() {
         return requestFrame.getHeader().toString()

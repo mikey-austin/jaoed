@@ -15,19 +15,20 @@ import org.slf4j.LoggerFactory;
 
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.PacketProcessor;
+import org.jaoed.packet.ProcessorRegistry;
 
 public class InterfaceListener implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceListener.class);
 
     private final PcapHandle handle;
-    private final Map<String, PacketProcessor> processors;
+    private final ProcessorRegistry processorRegistry;
     private final Consumer<Packet> sender;
     private volatile boolean running;
 
-    public InterfaceListener(PcapHandle handle) {
+    public InterfaceListener(PcapHandle handle, ProcessorRegistry processorRegistry) {
         this.handle = handle;
         this.running = false;
-        this.processors = new HashMap<>();
+        this.processorRegistry = processorRegistry;
         this.sender = packet -> {
             try {
                 handle.sendPacket(packet);
@@ -39,11 +40,6 @@ public class InterfaceListener implements Runnable {
 
     public void stop() {
         this.running = false;
-    }
-
-    public InterfaceListener addProcessor(String srcAddr, PacketProcessor processor) {
-        processors.put(srcAddr, processor);
-        return this;
     }
 
     @Override
@@ -60,13 +56,11 @@ public class InterfaceListener implements Runnable {
                 LOG.trace("received {} frame at {}: {}",
                     handle, handle.getTimestamp(), ctx);
 
-                // Evaluate ACLs, whether to drop the packet or not.
-                PacketProcessor processor;
-                if ((processor = processors.get(ctx.getDstAddr())) != null) {
-                    processor.enqueue(ctx);
-                } else {
-                    throw new Exception("no processor for " + ctx.getDstAddr());
-                }
+                PacketProcessor processor = processorRegistry
+                    .lookup(ctx)
+                    .orElseThrow(
+                        () -> new Exception("no processor for " + ctx.toString()));
+                processor.enqueue(ctx);
             } catch (EOFException e) {
                 LOG.info("received EOF in {} listener", handle);
                 stop();
