@@ -14,10 +14,12 @@ import org.jaoed.config.Device;
 import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.PacketProcessor;
+import org.jaoed.service.Service;
 
-public class DeviceTarget implements PacketProcessor, Runnable {
+public class DeviceTarget implements PacketProcessor, Runnable, Service {
     private static final Logger LOG = LoggerFactory.getLogger(DeviceTarget.class);
 
+    private final Thread deviceThread;
     private final BlockingQueue<TargetCommand> inputQueue;
     private final ResponseProcessor responseProcessor;
     private final CommandFactory commandFactory;
@@ -39,6 +41,7 @@ public class DeviceTarget implements PacketProcessor, Runnable {
         this.configArea = builder.configArea;
         this.firmwareVersion = builder.firmwareVersion;
         this.sectorCount = builder.sectorCount;
+        this.deviceThread = new Thread(this);
     }
 
     @Override
@@ -78,8 +81,19 @@ public class DeviceTarget implements PacketProcessor, Runnable {
         return deviceConfig;
     }
 
+    @Override
+    public void start() {
+        deviceThread.start();
+    }
+
+    @Override
     public void stop() {
         this.running = false;
+        try {
+            deviceThread.join();
+        } catch (Exception e) {
+            LOG.error("an error occured whilst exiting device thread", e);
+        }
     }
 
     @Override

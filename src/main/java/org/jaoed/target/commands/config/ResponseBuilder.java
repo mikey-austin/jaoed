@@ -46,11 +46,10 @@ public class ResponseBuilder implements TargetResponse {
     @Override
     public void sendResponse() {
         // Build and send off the response.
-        ctx.getSender().accept(getResponse());
+        ctx.getSender().accept(makeResponse());
     }
 
-    @Override
-    public Packet getResponse() {
+    public Packet makeResponse() {
         try {
             QueryConfig.Builder config = new QueryConfig.Builder()
                 .firmwareVersion(target.getFirmwareVersion())

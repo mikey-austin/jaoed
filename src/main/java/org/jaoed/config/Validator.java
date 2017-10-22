@@ -72,7 +72,7 @@ public class Validator implements ConfigVisitor {
         // Make sure every slot/shelf specification is unique.
         int shelf = device.getShelf();
         int slot = device.getSlot();
-        long shelfSlot = shelf << 32 | slot;
+        long shelfSlot = combineMajorMinor(shelf, slot);
         if (targetShelfSlots.contains(shelfSlot)) {
             exception = new ValidationException(
                 "Shelf " + Integer.toString(shelf) + " and slot "

@@ -1,7 +1,5 @@
 package org.jaoed.target;
 
-import java.util.Arrays;
-
 import org.mockito.*;
 import org.mockito.runners.*;
 import static org.mockito.Mockito.*;

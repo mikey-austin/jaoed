@@ -16,10 +16,12 @@ import org.slf4j.LoggerFactory;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.PacketProcessor;
 import org.jaoed.packet.ProcessorRegistry;
+import org.jaoed.service.Service;
 
-public class InterfaceListener implements Runnable {
+public class InterfaceListener implements Runnable, Service {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceListener.class);
 
+    private final Thread listenerThread;
     private final PcapHandle handle;
     private final ProcessorRegistry processorRegistry;
     private final Consumer<Packet> sender;
@@ -29,6 +31,7 @@ public class InterfaceListener implements Runnable {
         this.handle = handle;
         this.running = false;
         this.processorRegistry = processorRegistry;
+        this.listenerThread = new Thread(this);
         this.sender = packet -> {
             try {
                 handle.sendPacket(packet);
@@ -38,8 +41,19 @@ public class InterfaceListener implements Runnable {
         };
     }
 
+    @Override
+    public void start() {
+        listenerThread.start();
+    }
+
+    @Override
     public void stop() {
         this.running = false;
+        try {
+            listenerThread.join();
+        } catch (Exception e) {
+            LOG.error("an error occured whilst exiting listener thread", e);
+        }
     }
 
     @Override
@@ -63,7 +77,7 @@ public class InterfaceListener implements Runnable {
                 processor.enqueue(ctx);
             } catch (EOFException e) {
                 LOG.info("received EOF in {} listener", handle);
-                stop();
+                running = false;
             } catch (Exception e) {
                 LOG.error("could not process {} packet", handle, e);
             }

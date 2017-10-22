@@ -1,6 +1,5 @@
 package org.jaoed.net;
 
-import java.lang.Thread;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -50,10 +49,9 @@ public class InterfaceListenerTest {
         InterfaceListener listener = new InterfaceListener(
             handle, processorRegistry);
 
-        Thread thread = new Thread(listener);
-        thread.run();
+        listener.start();
+        Thread.sleep(1000);
         listener.stop();
-        thread.join();
 
         assertEquals(1, captured.size());
     }

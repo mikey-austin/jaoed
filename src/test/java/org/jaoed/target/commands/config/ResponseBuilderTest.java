@@ -65,7 +65,7 @@ public class ResponseBuilderTest {
         ResponseBuilder responseBuilder = new ResponseBuilder(ctx, target);
         responseBuilder.setPayload(payload);
 
-        EthernetPacket response = (EthernetPacket) responseBuilder.getResponse();
+        EthernetPacket response = (EthernetPacket) responseBuilder.makeResponse();
         assertNotNull(response);
 
         // Make sure addresses are swapped.
