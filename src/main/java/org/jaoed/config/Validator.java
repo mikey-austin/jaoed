@@ -1,18 +1,23 @@
 package org.jaoed.config;
 
-import java.util.HashMap;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.nio.file.FileSystems;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import static org.jaoed.target.TargetUtils.*;
 
 public class Validator implements ConfigVisitor {
-    private HashMap<String, Device> targets;
-    private HashMap<Long, Device> targetShelfSlots;
+    private Map<String, Device> targets;
+    private Set<Long> targetShelfSlots;
     private ValidationException exception;
 
     public Validator() {
         targets = new HashMap<>();
-        targetShelfSlots = new HashMap<>();
+        targetShelfSlots = new HashSet<>();
     }
 
     public void validate() throws ValidationException {
@@ -29,6 +34,12 @@ public class Validator implements ConfigVisitor {
 
         if (device.getSlot() < 0 || device.getShelf() < 0)
             throw new ValidationException("Device slot/shelf must be >= 0");
+
+        if (!validMajor(device.getShelf()))
+            throw new ValidationException("Device slot/shelf must fit in 2 bytes (unsigned)");
+
+        if (!validMinor(device.getSlot()))
+            throw new ValidationException("Device slot/shelf must fit in a byte (unsigned)");
 
         Path targetPath = FileSystems.getDefault().getPath(target);
         if (!targetPath.isAbsolute())
@@ -62,13 +73,13 @@ public class Validator implements ConfigVisitor {
         int shelf = device.getShelf();
         int slot = device.getSlot();
         long shelfSlot = shelf << 32 | slot;
-        if (targetShelfSlots.containsKey(shelfSlot)) {
+        if (targetShelfSlots.contains(shelfSlot)) {
             exception = new ValidationException(
                 "Shelf " + Integer.toString(shelf) + " and slot "
                 + Integer.toString(slot) + " for target "
                 + device.getTarget() + " has already been specified");
         } else {
-            targetShelfSlots.put(shelfSlot, device);
+            targetShelfSlots.add(shelfSlot);
         }
     }
 

@@ -24,72 +24,81 @@ public class Device implements Section {
         return shelf;
     }
 
-    public void setShelf(int shelf) {
+    public Device setShelf(int shelf) {
         this.shelf = shelf;
+        return this;
     }
 
     public int getSlot() {
         return slot;
     }
 
-    public void setSlot(int slot) {
+    public Device setSlot(int slot) {
         this.slot = slot;
+        return this;
     }
 
     public String getTarget() {
         return target;
     }
 
-    public void setTarget(String target) {
+    public Device setTarget(String target) {
         this.target = target;
+        return this;
     }
 
     public Interface getInterface() {
         return iface;
     }
 
-    public void setInterface(Interface iface) {
+    public Device setInterface(Interface iface) {
         this.iface = iface;
+        return this;
     }
 
     public boolean isWriteCacheOn() {
         return writeCache;
     }
 
-    public void setWriteCache(boolean writeCache) {
+    public Device setWriteCache(boolean writeCache) {
         this.writeCache = writeCache;
+        return this;
     }
 
     public boolean isBroadcastOn() {
         return broadcast;
     }
 
-    public void setBroadcast(boolean broadcast) {
+    public Device setBroadcast(boolean broadcast) {
         this.broadcast = broadcast;
+        return this;
     }
 
     public DeviceAcl getAcls() {
         return acls;
     }
 
-    public void setAcls(DeviceAcl acls) {
+    public Device setAcls(DeviceAcl acls) {
         this.acls = acls;
+        return this;
     }
 
     public Logger getLogger() {
         return logger;
     }
 
-    public void setLogger(Logger logger) {
+    public Device setLogger(Logger logger) {
         this.logger = logger;
+        return this;
     }
 
     public Logger.Level getLogLevel() {
         return logLevel;
     }
 
-    public void setLogLevel(Logger.Level logLevel) {
+    public Device setLogLevel(Logger.Level logLevel) {
         this.logLevel = logLevel;
+        return this;
     }
 
     public void acceptVisitor(ConfigVisitor visitor) {

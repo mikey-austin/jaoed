@@ -74,6 +74,10 @@ public class DeviceTarget implements PacketProcessor, Runnable {
         return (short) inputQueue.size();
     }
 
+    public Device getDevice() {
+        return deviceConfig;
+    }
+
     public void stop() {
         this.running = false;
     }
