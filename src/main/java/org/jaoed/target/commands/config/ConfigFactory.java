@@ -27,6 +27,10 @@ public class ConfigFactory implements CommandFactory {
     private final Map<QueryConfigCommand, BiFunction<RequestContext, QueryConfig, TargetCommand>> dispatch;
     private final BiFunction<RequestContext, DeviceTarget, ResponseBuilder> responseBuilderFactory;
 
+    public ConfigFactory() {
+        this(ResponseBuilder::new);
+    }
+
     public ConfigFactory(BiFunction<RequestContext, DeviceTarget, ResponseBuilder> responseBuilderFactory) {
         this.responseBuilderFactory = responseBuilderFactory;
         this.dispatch = new HashMap<>();

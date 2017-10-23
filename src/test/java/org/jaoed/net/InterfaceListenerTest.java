@@ -20,6 +20,7 @@ import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.EthernetPacket;
 
+import org.jaoed.config.Interface;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.namednumber.*;
 import org.jaoed.packet.PacketProcessor;
@@ -28,6 +29,7 @@ import org.jaoed.packet.ProcessorRegistry;
 @RunWith(MockitoJUnitRunner.class)
 public class InterfaceListenerTest {
     @Mock ProcessorRegistry processorRegistry;
+    @Mock Interface iface;
 
     @Test
     public void testInterfaceListener() throws Exception {
@@ -46,8 +48,11 @@ public class InterfaceListenerTest {
             .thenReturn(Optional.of(processor));
 
         PcapHandle handle = Pcaps.openOffline(file);
+        when(iface.getName()).thenReturn("eth0");
+        when(iface.getPcapHandle()).thenReturn(handle);
+
         InterfaceListener listener = new InterfaceListener(
-            handle, processorRegistry);
+            iface, processorRegistry);
 
         listener.start();
         Thread.sleep(1000);

@@ -1,5 +1,7 @@
 package org.jaoed.config;
 
+import org.pcap4j.core.PcapHandle;
+
 public class Interface implements Section {
     private String name;
     private Mtu mtu;
@@ -49,6 +51,11 @@ public class Interface implements Section {
 
     public void setLogLevel(Logger.Level logLevel) {
         this.logLevel = logLevel;
+    }
+
+    public PcapHandle getPcapHandle() {
+        // TODO: actually build handle from config params.
+        return null;
     }
 
     @Override

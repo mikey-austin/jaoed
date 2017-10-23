@@ -32,7 +32,7 @@ public class ConfigTest extends TestCase {
         Validator validator = new MockValidator();
         ConfigBuilder builder = new ConfigBuilder(validator);
         builder.parseFile(file);
-        Config config = builder.getConfig();
+        Config config = builder.build();
         assertNotNull(config);
 
         // Test parsed devices.
@@ -66,7 +66,7 @@ public class ConfigTest extends TestCase {
         Validator validator = new MockValidator();
         ConfigBuilder builder = new ConfigBuilder(validator);
         builder.parseFile(file);
-        Config config = builder.getConfig();
+        Config config = builder.build();
         assertNotNull(config);
 
         // Compare dump to expected contents.
@@ -91,7 +91,7 @@ public class ConfigTest extends TestCase {
             Validator validator = new MockValidator();
             ConfigBuilder builder = new ConfigBuilder(validator);
             builder.parseString(configData);
-            Config config = builder.getConfig();
+            Config config = builder.build();
             fail("Expected a duplicate target ValidationException to be thrown");
         } catch (ValidationException e) {
             assertTrue(
@@ -122,7 +122,7 @@ public class ConfigTest extends TestCase {
         try {
             ConfigBuilder builder = new ConfigBuilder();
             builder.parseString(configData);
-            Config config = builder.getConfig();
+            Config config = builder.build();
             fail("Expected a duplicate slot/shelf ValidationException to be thrown");
         } catch (ValidationException e) {
             assertTrue(e.getMessage(),

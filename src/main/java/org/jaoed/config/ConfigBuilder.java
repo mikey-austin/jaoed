@@ -32,19 +32,21 @@ public class ConfigBuilder extends ConfigBaseListener {
         this.validator = validator;
     }
 
-    public Config getConfig() throws ValidationException {
+    public Config build() throws ValidationException {
         config.validate(validator);
         return config;
     }
 
-    public void parseString(String data) throws IOException {
+    public ConfigBuilder parseString(String data) throws IOException {
         CharStream stream = (CharStream) new ANTLRInputStream(data);
         parseInputStream(stream);
+        return this;
     }
 
-    public void parseFile(String fileName) throws IOException {
+    public ConfigBuilder parseFile(String fileName) throws IOException {
         CharStream stream = (CharStream) new ANTLRFileStream(fileName);
         parseInputStream(stream);
+        return this;
     }
 
     public void parseInputStream(CharStream stream)

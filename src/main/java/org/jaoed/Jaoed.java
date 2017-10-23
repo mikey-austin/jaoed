@@ -1,27 +1,20 @@
 package org.jaoed;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.jaoed.service.App;
+import org.jaoed.service.ConfigAppBuilder;
 
 public class Jaoed {
-    public static void main(String[] args) throws Exception {
-        // Parse command line args
+    private static final Logger LOG = LoggerFactory.getLogger(Jaoed.class);
 
-        // Load configuration
-
-        // Create interface registry
-
-        // Create logger registry
-
-        // Create Acl registry
-
-        // Create target worker threads
-
-        // Setup environment
-        //   - setup pidfile
-        //   - setup logging
-
-        // Create queues and threads
-        //   - interface listeners
-        //   - storage targets
-        //   - interface senders
+    public static void main(String[] args) {
+        try {
+            App app = new ConfigAppBuilder(args[0]).build();
+            app.start();
+        } catch (Exception e) {
+            LOG.error("an error occured whilst starting the application", e);
+        }
     }
 }

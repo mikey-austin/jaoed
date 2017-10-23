@@ -13,6 +13,7 @@ import org.pcap4j.packet.EthernetPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jaoed.config.Interface;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.PacketProcessor;
 import org.jaoed.packet.ProcessorRegistry;
@@ -22,13 +23,15 @@ public class InterfaceListener implements Runnable, Service {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceListener.class);
 
     private final Thread listenerThread;
+    private final Interface iface;
     private final PcapHandle handle;
     private final ProcessorRegistry processorRegistry;
     private final Consumer<Packet> sender;
     private volatile boolean running;
 
-    public InterfaceListener(PcapHandle handle, ProcessorRegistry processorRegistry) {
-        this.handle = handle;
+    public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry) {
+        this.iface = iface;
+        this.handle = iface.getPcapHandle();
         this.running = false;
         this.processorRegistry = processorRegistry;
         this.listenerThread = new Thread(this);
@@ -36,7 +39,7 @@ public class InterfaceListener implements Runnable, Service {
             try {
                 handle.sendPacket(packet);
             } catch (Exception e) {
-                LOG.error("could not send packet via handle {}", handle, e);
+                LOG.error("could not send packet via {} interface", this, e);
             }
         };
     }
@@ -76,11 +79,16 @@ public class InterfaceListener implements Runnable, Service {
                         () -> new Exception("no processor for " + ctx.toString()));
                 processor.enqueue(ctx);
             } catch (EOFException e) {
-                LOG.info("received EOF in {} listener", handle);
+                LOG.info("received EOF in {} listener", this);
                 running = false;
             } catch (Exception e) {
-                LOG.error("could not process {} packet", handle, e);
+                LOG.error("could not process {} packet", this, e);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return iface.getName();
     }
 }
