@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.pcap4j.core.BpfProgram;
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.EthernetPacket;
@@ -33,7 +34,10 @@ public class InterfaceListener implements Runnable, Service {
     public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry) throws Exception {
         this(iface, processorRegistry, _iface -> {
                 try {
-                    return new PcapHandle.Builder(_iface.getName()).build();
+                    PcapHandle handle = new PcapHandle.Builder(_iface.getName())
+                        .build();
+                    handle.setFilter("ether proto 0x88A2", BpfProgram.BpfCompileMode.OPTIMIZE);
+                    return handle;
                 } catch (Exception e) {
                     LOG.error("could not create pcap handle", e);
                     return null;
