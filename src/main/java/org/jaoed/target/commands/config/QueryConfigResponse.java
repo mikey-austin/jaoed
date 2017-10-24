@@ -90,8 +90,9 @@ public class QueryConfigResponse implements TargetResponse {
             // Reverse ethernet request addresses.
             eth.dstAddr(
                 ctx.getEthernetFrame().getHeader().getSrcAddr());
-            eth.srcAddr(
-                ctx.getEthernetFrame().getHeader().getDstAddr());
+
+            // Always stamp the incoming interface's hardware address.
+            eth.srcAddr(ctx.getIfaceAddr());
 
             return eth.build();
         } catch (Exception e) {

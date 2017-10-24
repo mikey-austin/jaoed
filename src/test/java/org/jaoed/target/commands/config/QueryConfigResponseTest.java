@@ -67,6 +67,7 @@ public class QueryConfigResponseTest {
         when(target.getBufferCount()).thenReturn((short) 3);
         when(target.getDevice()).thenReturn(device);
         when(ctx.getAoeFrame()).thenReturn(aoeFrame);
+        when(ctx.getIfaceAddr()).thenReturn(MacAddress.getByName("de:ad:be:ef:33:11"));
         when(ctx.getEthernetFrame()).thenReturn(ethFrame);
 
         byte[] payload = new byte[] { 'a', 'b', 'c' };
@@ -78,7 +79,7 @@ public class QueryConfigResponseTest {
 
         // Make sure addresses are swapped.
         EthernetPacket.EthernetHeader ethHeader = response.getHeader();
-        assertEquals("de:ad:be:ef:00:02", ethHeader.getSrcAddr().toString());
+        assertEquals("de:ad:be:ef:33:11", ethHeader.getSrcAddr().toString());
         assertEquals("de:ad:be:ef:00:01", ethHeader.getDstAddr().toString());
 
         // Pull out the wrapped packets to check the frame was built

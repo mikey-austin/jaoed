@@ -20,6 +20,7 @@ import org.pcap4j.core.PcapHandle.TimestampPrecision;
 import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.EthernetPacket;
+import org.pcap4j.util.MacAddress;
 
 import org.jaoed.config.Interface;
 import org.jaoed.packet.AoeFrame;
@@ -56,7 +57,8 @@ public class InterfaceListenerTest {
                 } catch (Exception e) {
                     return null;
                 }
-            });
+            },
+            MacAddress.getByName("de:ad:be:ef:00:01"));
 
         listener.start();
         Thread.sleep(1000);

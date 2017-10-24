@@ -115,7 +115,7 @@ public class QueryConfigCommand implements CommandFactory {
             if (configArea.isEmpty()) {
                 byte[] toSet = query.getPayload().getRawData();
                 configArea.setConfig(toSet);
-                LOG.debug("setting config string for device {}", target);
+                LOG.debug("setting config string of {} bytes for device {}", toSet.length, target);
                 return queryConfigResponseFactory.apply(ctx, target)
                     .setPayload(toSet);
             } else {
@@ -131,7 +131,7 @@ public class QueryConfigCommand implements CommandFactory {
             ConfigArea configArea = target.getConfigArea();
             byte[] toSet = query.getPayload().getRawData();
             configArea.setConfig(toSet);
-            LOG.debug("force setting config string for device {}", target);
+            LOG.debug("force setting config string of {} bytes for device {}", toSet.length, target);
             return queryConfigResponseFactory.apply(ctx, target)
                 .setPayload(toSet);
         };
