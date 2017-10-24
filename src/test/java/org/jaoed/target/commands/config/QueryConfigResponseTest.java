@@ -18,7 +18,7 @@ import org.pcap4j.util.MacAddress;
 
 import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
-import org.jaoed.packet.QueryConfig;
+import org.jaoed.packet.QueryConfigPayload;
 import org.jaoed.packet.namednumber.AoeError;
 import org.jaoed.packet.namednumber.QueryConfigSubCommand;
 import org.jaoed.target.CommandFactory;
@@ -27,13 +27,13 @@ import org.jaoed.target.TargetCommand;
 import org.jaoed.target.TargetResponse;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ResponseBuilderTest {
+public class QueryConfigResponseTest {
     @Mock DeviceTarget target;
     @Mock RequestContext ctx;
 
     @Test
-    public void testResponseBuilder() throws Exception {
-        QueryConfig.Builder query = new QueryConfig.Builder()
+    public void testQueryConfigResponse() throws Exception {
+        QueryConfigPayload.Builder query = new QueryConfigPayload.Builder()
             .subCommand(QueryConfigSubCommand.READ_CONFIG); ;
         AoeFrame aoeFrame = new AoeFrame.Builder()
             .version((byte) 1)
@@ -62,10 +62,10 @@ public class ResponseBuilderTest {
         when(ctx.getEthernetFrame()).thenReturn(ethFrame);
 
         byte[] payload = new byte[] { 'a', 'b', 'c' };
-        ResponseBuilder responseBuilder = new ResponseBuilder(ctx, target);
-        responseBuilder.setPayload(payload);
+        QueryConfigResponse queryConfigResponse = new QueryConfigResponse(ctx, target);
+        queryConfigResponse.setPayload(payload);
 
-        EthernetPacket response = (EthernetPacket) responseBuilder.makeResponse();
+        EthernetPacket response = (EthernetPacket) queryConfigResponse.makeResponse();
         assertNotNull(response);
 
         // Make sure addresses are swapped.
@@ -80,7 +80,7 @@ public class ResponseBuilderTest {
         assertTrue(innerAoe.getHeader().getResponseFlag());
         assertFalse(innerAoe.getHeader().getResponseErrorFlag());
 
-        QueryConfig innerCmd = QueryConfig.newPacket(innerAoe.getPayload());
+        QueryConfigPayload innerCmd = QueryConfigPayload.newPacket(innerAoe.getPayload());
         assertNotNull(innerCmd);
         assertEquals((short) 1, innerCmd.getHeader().getFirmwareVersion());
         assertEquals((byte) 2, innerCmd.getHeader().getSectorCount());

@@ -21,12 +21,12 @@ import org.slf4j.LoggerFactory;
 
 import org.jaoed.packet.namednumber.*;
 
-public class QueryConfigTest {
-    private static final Logger LOG = LoggerFactory.getLogger(QueryConfigTest.class);
+public class QueryConfigPayloadTest {
+    private static final Logger LOG = LoggerFactory.getLogger(QueryConfigPayloadTest.class);
 
     @Test
     public void testBuilder() throws IllegalRawDataException {
-        QueryConfig.Builder builder = new QueryConfig.Builder()
+        QueryConfigPayload.Builder builder = new QueryConfigPayload.Builder()
             .bufferCount((short) 1)
             .firmwareVersion((short) 2)
             .sectorCount((byte) 3)
@@ -34,24 +34,24 @@ public class QueryConfigTest {
             .subCommand((byte) 2)
             .configStringLength((short) 13);
 
-        QueryConfig queryConfig = builder.build();
+        QueryConfigPayload queryConfig = builder.build();
         assertNotNull(queryConfig);
         LOG.info("built query config: {}", queryConfig);
 
         // Now parse the built packet.
         byte[] rawPacket = queryConfig.getRawData();
-        QueryConfig queryConfig2 = QueryConfig.newPacket(rawPacket, 0, rawPacket.length);
+        QueryConfigPayload queryConfig2 = QueryConfigPayload.newPacket(rawPacket, 0, rawPacket.length);
         assertNotNull(queryConfig2);
         LOG.info("parsed query config: {}", queryConfig2);
 
-        QueryConfig.QueryConfigHeader header = queryConfig.getHeader();
-        QueryConfig.QueryConfigHeader header2 = queryConfig2.getHeader();
+        QueryConfigPayload.QueryConfigPayloadHeader header = queryConfig.getHeader();
+        QueryConfigPayload.QueryConfigPayloadHeader header2 = queryConfig2.getHeader();
         assertTrue(header.equals(header2));
 
-        QueryConfig.Builder builder2 = queryConfig.getBuilder();
-        QueryConfig queryConfig3 = builder2.build();
+        QueryConfigPayload.Builder builder2 = queryConfig.getBuilder();
+        QueryConfigPayload queryConfig3 = builder2.build();
         LOG.info("3rd built query config: {}", queryConfig3);
-        QueryConfig.QueryConfigHeader header3 = queryConfig3.getHeader();
+        QueryConfigPayload.QueryConfigPayloadHeader header3 = queryConfig3.getHeader();
         assertTrue(header.equals(header3));
     }
 }

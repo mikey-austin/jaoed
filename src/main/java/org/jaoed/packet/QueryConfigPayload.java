@@ -14,26 +14,26 @@ import static org.pcap4j.util.ByteArrays.*;
 
 import org.jaoed.packet.namednumber.*;
 
-public final class QueryConfig extends AbstractPacket {
-    private final QueryConfigHeader header;
+public final class QueryConfigPayload extends AbstractPacket {
+    private final QueryConfigPayloadHeader header;
     private final Packet payload;
 
-    public static QueryConfig newPacket(Packet payload) throws IllegalRawDataException {
+    public static QueryConfigPayload newPacket(Packet payload) throws IllegalRawDataException {
         byte[] rawData = payload.getRawData();
         return newPacket(rawData, 0, rawData.length);
     }
 
-    public static QueryConfig newPacket(byte[] rawData, int offset, int length)
+    public static QueryConfigPayload newPacket(byte[] rawData, int offset, int length)
         throws IllegalRawDataException {
 
         ByteArrays.validateBounds(rawData, offset, length);
-        return new QueryConfig(rawData, offset, length);
+        return new QueryConfigPayload(rawData, offset, length);
     }
 
-    private QueryConfig(byte[] rawData, int offset, int length)
+    private QueryConfigPayload(byte[] rawData, int offset, int length)
         throws IllegalRawDataException {
 
-        this.header = new QueryConfigHeader(rawData, offset, length);
+        this.header = new QueryConfigPayloadHeader(rawData, offset, length);
 
         // We don't use packet factories, so just put the rest as an
         // unknown packet.
@@ -50,15 +50,15 @@ public final class QueryConfig extends AbstractPacket {
         }
     }
 
-    private QueryConfig(Builder builder) {
-        this.header = new QueryConfigHeader(builder);
+    private QueryConfigPayload(Builder builder) {
+        this.header = new QueryConfigPayloadHeader(builder);
         this.payload = builder.payloadBuilder != null
             ? builder.payloadBuilder.build()
             : null;
     }
 
     @Override
-    public QueryConfigHeader getHeader() {
+    public QueryConfigPayloadHeader getHeader() {
         return header;
     }
 
@@ -83,8 +83,8 @@ public final class QueryConfig extends AbstractPacket {
 
         public Builder() {}
 
-        private Builder(QueryConfig packet) {
-            QueryConfigHeader header = packet.getHeader();
+        private Builder(QueryConfigPayload packet) {
+            QueryConfigPayloadHeader header = packet.getHeader();
             this.bufferCount = header.bufferCount;
             this.firmwareVersion = header.firmwareVersion;
             this.sectorCount = header.sectorCount;
@@ -144,12 +144,12 @@ public final class QueryConfig extends AbstractPacket {
         }
 
         @Override
-        public QueryConfig build() {
-            return new QueryConfig(this);
+        public QueryConfigPayload build() {
+            return new QueryConfigPayload(this);
         }
     }
 
-    public static final class QueryConfigHeader extends AbstractHeader {
+    public static final class QueryConfigPayloadHeader extends AbstractHeader {
         private static final int QUERY_CONFIG_SIZE = 8;
 
         private static final int BUFFER_COUNT_OFFSET = 0;
@@ -174,10 +174,10 @@ public final class QueryConfig extends AbstractPacket {
         private QueryConfigSubCommand subCommand;
         private short configStringLength = 0;
 
-        private QueryConfigHeader(byte[] rawData, int offset, int length) throws IllegalRawDataException {
+        private QueryConfigPayloadHeader(byte[] rawData, int offset, int length) throws IllegalRawDataException {
             if (length < QUERY_CONFIG_SIZE) {
                 StringBuilder sb = new StringBuilder(200);
-                sb.append("The data is too short to build a QueryConfig header (")
+                sb.append("The data is too short to build a QueryConfigPayload header (")
                     .append(QUERY_CONFIG_SIZE)
                     .append(" bytes). data: ")
                     .append(ByteArrays.toHexString(rawData, " "))
@@ -201,7 +201,7 @@ public final class QueryConfig extends AbstractPacket {
             this.configStringLength = ByteArrays.getShort(rawData, CONFIG_STR_LEN_OFFSET + offset);
         }
 
-        private QueryConfigHeader(Builder builder) {
+        private QueryConfigPayloadHeader(Builder builder) {
             this.bufferCount = builder.bufferCount;
             this.firmwareVersion = builder.firmwareVersion;
             this.sectorCount = builder.sectorCount;
@@ -259,7 +259,7 @@ public final class QueryConfig extends AbstractPacket {
             StringBuilder sb = new StringBuilder();
             String ls = System.getProperty("line.separator");
 
-            sb.append("[AoE/QueryConfig (")
+            sb.append("[AoE/QueryConfigPayload (")
                 .append(length())
                 .append(" bytes)]")
                 .append(ls);
@@ -292,7 +292,7 @@ public final class QueryConfig extends AbstractPacket {
             if (!this.getClass().isInstance(obj))
                 return false;
 
-            QueryConfigHeader other = (QueryConfigHeader) obj;
+            QueryConfigPayloadHeader other = (QueryConfigPayloadHeader) obj;
             return
                 bufferCount == other.bufferCount
                 && firmwareVersion == other.firmwareVersion

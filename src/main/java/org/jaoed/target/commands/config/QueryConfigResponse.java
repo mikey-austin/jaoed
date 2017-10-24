@@ -11,33 +11,33 @@ import org.slf4j.LoggerFactory;
 import org.jaoed.net.AoeVersion;
 import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
-import org.jaoed.packet.QueryConfig;
+import org.jaoed.packet.QueryConfigPayload;
 import org.jaoed.packet.namednumber.AoeError;
 import org.jaoed.target.DeviceTarget;
 import org.jaoed.target.TargetCommand;
 import org.jaoed.target.TargetResponse;
 
-public class ResponseBuilder implements TargetResponse {
-    private static final Logger LOG = LoggerFactory.getLogger(ResponseBuilder.class);
+public class QueryConfigResponse implements TargetResponse {
+    private static final Logger LOG = LoggerFactory.getLogger(QueryConfigResponse.class);
 
     private final RequestContext ctx;
     private final DeviceTarget target;
     private byte[] payload;
     private AoeError error;
 
-    protected ResponseBuilder(RequestContext ctx, DeviceTarget target) {
+    protected QueryConfigResponse(RequestContext ctx, DeviceTarget target) {
         this.ctx = ctx;
         this.target = target;
         this.payload = new byte[] {};
         this.error = null;
     }
 
-    protected ResponseBuilder setPayload(byte[] payload) {
+    protected QueryConfigResponse setPayload(byte[] payload) {
         this.payload = payload;
         return this;
     }
 
-    protected ResponseBuilder setError(AoeError error) {
+    protected QueryConfigResponse setError(AoeError error) {
         this.error = error;
         return this;
     }
@@ -50,7 +50,7 @@ public class ResponseBuilder implements TargetResponse {
 
     public Packet makeResponse() {
         try {
-            QueryConfig.Builder config = new QueryConfig.Builder()
+            QueryConfigPayload.Builder config = new QueryConfigPayload.Builder()
                 .firmwareVersion(target.getFirmwareVersion())
                 .sectorCount(target.getSectorCount())
                 .bufferCount(target.getBufferCount())
@@ -63,7 +63,7 @@ public class ResponseBuilder implements TargetResponse {
             }
 
             if (ctx.getAoeFrame().getPayload() != null) {
-                QueryConfig requestConfig = QueryConfig.newPacket(
+                QueryConfigPayload requestConfig = QueryConfigPayload.newPacket(
                     ctx.getAoeFrame().getPayload());
                 config.subCommand(
                     requestConfig.getHeader().getSubCommand());
