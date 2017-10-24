@@ -53,7 +53,7 @@ public class ConfigAppBuilder implements AppBuilder {
         // TODO: add more commands here.
         CommandFactory commandDispatcher = CommandDispatcher
             .newBuilder()
-            .addCommandFactory(AoeCommand.QUERY_CONFIG, new ConfigFactory())
+            .addCommandFactory(AoeCommand.QUERY_CONFIG, new QueryConfigCommand())
             .build();
 
         // TODO: make configurable per device section.

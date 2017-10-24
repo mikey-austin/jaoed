@@ -13,7 +13,6 @@ import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.QueryConfig;
 import org.jaoed.packet.namednumber.AoeError;
-import org.jaoed.packet.namednumber.QueryConfigCommand;
 import org.jaoed.target.DeviceTarget;
 import org.jaoed.target.TargetCommand;
 import org.jaoed.target.TargetResponse;

@@ -20,7 +20,7 @@ import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.QueryConfig;
 import org.jaoed.packet.namednumber.AoeError;
-import org.jaoed.packet.namednumber.QueryConfigCommand;
+import org.jaoed.packet.namednumber.QueryConfigSubCommand;
 import org.jaoed.target.CommandFactory;
 import org.jaoed.target.DeviceTarget;
 import org.jaoed.target.TargetCommand;
@@ -34,7 +34,7 @@ public class ResponseBuilderTest {
     @Test
     public void testResponseBuilder() throws Exception {
         QueryConfig.Builder query = new QueryConfig.Builder()
-            .subCommand(QueryConfigCommand.READ_CONFIG);
+            .subCommand(QueryConfigSubCommand.READ_CONFIG); ;
         AoeFrame aoeFrame = new AoeFrame.Builder()
             .version((byte) 1)
             .responseFlag(false)

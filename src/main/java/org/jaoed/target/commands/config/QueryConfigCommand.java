@@ -14,31 +14,31 @@ import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.QueryConfig;
 import org.jaoed.packet.namednumber.AoeError;
-import org.jaoed.packet.namednumber.QueryConfigCommand;
+import org.jaoed.packet.namednumber.QueryConfigSubCommand;
 import org.jaoed.target.CommandFactory;
 import org.jaoed.target.ConfigArea;
 import org.jaoed.target.DeviceTarget;
 import org.jaoed.target.TargetCommand;
 import org.jaoed.target.TargetResponse;
 
-public class ConfigFactory implements CommandFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(ConfigFactory.class);
+public class QueryConfigCommand implements CommandFactory {
+    private static final Logger LOG = LoggerFactory.getLogger(QueryConfigCommand.class);
 
-    private final Map<QueryConfigCommand, BiFunction<RequestContext, QueryConfig, TargetCommand>> dispatch;
+    private final Map<QueryConfigSubCommand, BiFunction<RequestContext, QueryConfig, TargetCommand>> dispatch;
     private final BiFunction<RequestContext, DeviceTarget, ResponseBuilder> responseBuilderFactory;
 
-    public ConfigFactory() {
+    public QueryConfigCommand() {
         this(ResponseBuilder::new);
     }
 
-    public ConfigFactory(BiFunction<RequestContext, DeviceTarget, ResponseBuilder> responseBuilderFactory) {
+    public QueryConfigCommand(BiFunction<RequestContext, DeviceTarget, ResponseBuilder> responseBuilderFactory) {
         this.responseBuilderFactory = responseBuilderFactory;
         this.dispatch = new HashMap<>();
-        this.dispatch.put(QueryConfigCommand.READ_CONFIG, this::readConfig);
-        this.dispatch.put(QueryConfigCommand.TEST_FULL_MATCH, this::testFullMatch);
-        this.dispatch.put(QueryConfigCommand.TEST_PREFIX_MATCH, this::testPrefixMatch);
-        this.dispatch.put(QueryConfigCommand.SET_IF_EMPTY, this::setIfEmpty);
-        this.dispatch.put(QueryConfigCommand.SET_FORCE, this::setForce);
+        this.dispatch.put(QueryConfigSubCommand.READ_CONFIG, this::readConfig);
+        this.dispatch.put(QueryConfigSubCommand.TEST_FULL_MATCH, this::testFullMatch);
+        this.dispatch.put(QueryConfigSubCommand.TEST_PREFIX_MATCH, this::testPrefixMatch);
+        this.dispatch.put(QueryConfigSubCommand.SET_IF_EMPTY, this::setIfEmpty);
+        this.dispatch.put(QueryConfigSubCommand.SET_FORCE, this::setForce);
     }
 
     @Override

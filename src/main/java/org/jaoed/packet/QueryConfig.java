@@ -77,7 +77,7 @@ public final class QueryConfig extends AbstractPacket {
         private short firmwareVersion;
         private byte sectorCount;
         private byte aoeProtocolVersion;
-        private QueryConfigCommand subCommand;
+        private QueryConfigSubCommand subCommand;
         private short configStringLength;
         private AbstractPacket.Builder payloadBuilder;
 
@@ -90,7 +90,7 @@ public final class QueryConfig extends AbstractPacket {
             this.sectorCount = header.sectorCount;
             this.aoeProtocolVersion = header.aoeProtocolVersion;
             this.configStringLength = header.configStringLength;
-            QueryConfigCommand
+            QueryConfigSubCommand
                 .getInstance(header.subCommand.value())
                 .ifPresent(command -> this.subCommand = command);
             if (packet.payload != null)
@@ -118,11 +118,11 @@ public final class QueryConfig extends AbstractPacket {
         }
 
         public Builder subCommand(byte command) {
-            QueryConfigCommand.getInstance(command).ifPresent(this::subCommand);
+            QueryConfigSubCommand.getInstance(command).ifPresent(this::subCommand);
             return this;
         }
 
-        public Builder subCommand(QueryConfigCommand subCommand) {
+        public Builder subCommand(QueryConfigSubCommand subCommand) {
             this.subCommand = subCommand;
             return this;
         }
@@ -171,7 +171,7 @@ public final class QueryConfig extends AbstractPacket {
         private short firmwareVersion = 0;
         private byte sectorCount = 0;
         private byte aoeProtocolVersion = 0;
-        private QueryConfigCommand subCommand;
+        private QueryConfigSubCommand subCommand;
         private short configStringLength = 0;
 
         private QueryConfigHeader(byte[] rawData, int offset, int length) throws IllegalRawDataException {
@@ -194,7 +194,7 @@ public final class QueryConfig extends AbstractPacket {
 
             byte aoeCmdByte = ByteArrays.getByte(rawData, AOE_CMD_OFFSET + offset);
             this.aoeProtocolVersion = (byte) ((aoeCmdByte & 0xF0) >>> 4);
-            QueryConfigCommand
+            QueryConfigSubCommand
                 .getInstance((byte) (aoeCmdByte & 0x0F))
                 .ifPresent(command -> this.subCommand = command);
 
@@ -226,7 +226,7 @@ public final class QueryConfig extends AbstractPacket {
             return aoeProtocolVersion;
         }
 
-        public QueryConfigCommand getSubCommand() {
+        public QueryConfigSubCommand getSubCommand() {
             return subCommand;
         }
 

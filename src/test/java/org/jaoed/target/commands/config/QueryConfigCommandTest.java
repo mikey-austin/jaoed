@@ -17,7 +17,7 @@ import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.QueryConfig;
 import org.jaoed.packet.namednumber.AoeError;
-import org.jaoed.packet.namednumber.QueryConfigCommand;
+import org.jaoed.packet.namednumber.QueryConfigSubCommand;
 import org.jaoed.target.CommandFactory;
 import org.jaoed.target.DeviceConfigArea;
 import org.jaoed.target.DeviceTarget;
@@ -25,7 +25,7 @@ import org.jaoed.target.TargetCommand;
 import org.jaoed.target.TargetResponse;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ConfigFactoryTest {
+public class QueryConfigCommandTest {
     @Mock DeviceTarget target;
     @Mock AoeFrame a1;
     @Mock RequestContext ctx1;
@@ -36,7 +36,7 @@ public class ConfigFactoryTest {
     public void testReadConfig() {
         DeviceConfigArea emptyArea = new DeviceConfigArea();
         QueryConfig query = new QueryConfig.Builder()
-            .subCommand(QueryConfigCommand.READ_CONFIG)
+            .subCommand(QueryConfigSubCommand.READ_CONFIG)
             .build();
 
         when(target.getConfigArea()).thenReturn(emptyArea);
@@ -46,8 +46,8 @@ public class ConfigFactoryTest {
 
         // Test empty config string.
         byte[] configStr = new byte[] { 'a', 'b', 'c' };
-        ConfigFactory configFactory = new ConfigFactory(responseBuilderFactory);
-        TargetCommand cmd = configFactory.makeCommand(ctx1);
+        QueryConfigCommand queryConfigCommand = new QueryConfigCommand(responseBuilderFactory);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
         assertNotNull(cmd);
         cmd.execute(target);
         verify(responseBuilder, never()).setPayload(configStr);
@@ -56,7 +56,7 @@ public class ConfigFactoryTest {
         DeviceConfigArea nonEmptyArea = new DeviceConfigArea();
         nonEmptyArea.setConfig(configStr);
         when(target.getConfigArea()).thenReturn(nonEmptyArea);
-        cmd = configFactory.makeCommand(ctx1);
+        cmd = queryConfigCommand.makeCommand(ctx1);
         assertNotNull(cmd);
         cmd.execute(target);
         verify(responseBuilder).setPayload(configStr);
@@ -66,7 +66,7 @@ public class ConfigFactoryTest {
     public void testFullMatch() {
         byte[] toMatch = new byte[] { 'a', 'b', 'c' };
         QueryConfig query = new QueryConfig.Builder()
-            .subCommand(QueryConfigCommand.TEST_FULL_MATCH)
+            .subCommand(QueryConfigSubCommand.TEST_FULL_MATCH)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toMatch))
             .build();
@@ -80,8 +80,8 @@ public class ConfigFactoryTest {
         when(responseBuilderFactory.apply(ctx1, target)).thenReturn(responseBuilder);
 
         // Test that the full payload is returned in the response.
-        ConfigFactory configFactory = new ConfigFactory(responseBuilderFactory);
-        TargetCommand cmd = configFactory.makeCommand(ctx1);
+        QueryConfigCommand queryConfigCommand = new QueryConfigCommand(responseBuilderFactory);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
         assertNotNull(cmd);
         assertEquals(responseBuilder, cmd.execute(target));
         verify(responseBuilder, times(1)).setPayload(configStr);
@@ -89,12 +89,12 @@ public class ConfigFactoryTest {
         // Test mismatch.
         byte[] toMismatch = new byte[] { '1', '2', '3' };
         query = new QueryConfig.Builder()
-            .subCommand(QueryConfigCommand.TEST_FULL_MATCH)
+            .subCommand(QueryConfigSubCommand.TEST_FULL_MATCH)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toMismatch))
             .build();
         when(a1.getPayload()).thenReturn(query);
-        cmd = configFactory.makeCommand(ctx1);
+        cmd = queryConfigCommand.makeCommand(ctx1);
         assertNotNull(cmd);
         assertNull(cmd.execute(target));
         verify(responseBuilder, times(1)).setPayload(configStr); // ie was not called again.
@@ -104,7 +104,7 @@ public class ConfigFactoryTest {
     public void testPrefixMatch() {
         byte[] toMatch = new byte[] { 'a', 'b' };
         QueryConfig query = new QueryConfig.Builder()
-            .subCommand(QueryConfigCommand.TEST_PREFIX_MATCH)
+            .subCommand(QueryConfigSubCommand.TEST_PREFIX_MATCH)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toMatch))
             .build();
@@ -118,8 +118,8 @@ public class ConfigFactoryTest {
         when(responseBuilderFactory.apply(ctx1, target)).thenReturn(responseBuilder);
 
         // Test that the full payload is returned in the response.
-        ConfigFactory configFactory = new ConfigFactory(responseBuilderFactory);
-        TargetCommand cmd = configFactory.makeCommand(ctx1);
+        QueryConfigCommand queryConfigCommand = new QueryConfigCommand(responseBuilderFactory);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
         assertNotNull(cmd);
         assertEquals(responseBuilder, cmd.execute(target));
         verify(responseBuilder, times(1)).setPayload(configStr);
@@ -127,12 +127,12 @@ public class ConfigFactoryTest {
         // Test mismatch.
         byte[] toMismatch = new byte[] { '1', '2', '3' };
         query = new QueryConfig.Builder()
-            .subCommand(QueryConfigCommand.TEST_PREFIX_MATCH)
+            .subCommand(QueryConfigSubCommand.TEST_PREFIX_MATCH)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toMismatch))
             .build();
         when(a1.getPayload()).thenReturn(query);
-        cmd = configFactory.makeCommand(ctx1);
+        cmd = queryConfigCommand.makeCommand(ctx1);
         assertNotNull(cmd);
         assertNull(cmd.execute(target));
         verify(responseBuilder, times(1)).setPayload(configStr); // ie was not called again.
@@ -142,7 +142,7 @@ public class ConfigFactoryTest {
     public void testSetIfEmpty() {
         byte[] toSet = new byte[] { '1', '2', '3' };
         QueryConfig query = new QueryConfig.Builder()
-            .subCommand(QueryConfigCommand.SET_IF_EMPTY)
+            .subCommand(QueryConfigSubCommand.SET_IF_EMPTY)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toSet))
             .build();
@@ -153,8 +153,8 @@ public class ConfigFactoryTest {
         when(ctx1.getAoeFrame()).thenReturn(a1);
         when(responseBuilderFactory.apply(ctx1, target)).thenReturn(responseBuilder);
 
-        ConfigFactory configFactory = new ConfigFactory(responseBuilderFactory);
-        TargetCommand cmd = configFactory.makeCommand(ctx1);
+        QueryConfigCommand queryConfigCommand = new QueryConfigCommand(responseBuilderFactory);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
         assertNotNull(cmd);
         cmd.execute(target);
         verify(responseBuilder).setPayload(toSet);
@@ -165,7 +165,7 @@ public class ConfigFactoryTest {
     public void testSetIfEmptyFail() {
         byte[] toSet = new byte[] { '1', '2', '3' };
         QueryConfig query = new QueryConfig.Builder()
-            .subCommand(QueryConfigCommand.SET_IF_EMPTY)
+            .subCommand(QueryConfigSubCommand.SET_IF_EMPTY)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toSet))
             .build();
@@ -177,8 +177,8 @@ public class ConfigFactoryTest {
         when(ctx1.getAoeFrame()).thenReturn(a1);
         when(responseBuilderFactory.apply(ctx1, target)).thenReturn(responseBuilder);
 
-        ConfigFactory configFactory = new ConfigFactory(responseBuilderFactory);
-        TargetCommand cmd = configFactory.makeCommand(ctx1);
+        QueryConfigCommand queryConfigCommand = new QueryConfigCommand(responseBuilderFactory);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
         assertNotNull(cmd);
         cmd.execute(target);
         verify(responseBuilder, never()).setPayload(toSet);
@@ -189,7 +189,7 @@ public class ConfigFactoryTest {
     public void testForceSet() {
         byte[] toSet = new byte[] { '1', '2', '3' };
         QueryConfig query = new QueryConfig.Builder()
-            .subCommand(QueryConfigCommand.SET_FORCE)
+            .subCommand(QueryConfigSubCommand.SET_FORCE)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toSet))
             .build();
@@ -200,8 +200,8 @@ public class ConfigFactoryTest {
         when(ctx1.getAoeFrame()).thenReturn(a1);
         when(responseBuilderFactory.apply(ctx1, target)).thenReturn(responseBuilder);
 
-        ConfigFactory configFactory = new ConfigFactory(responseBuilderFactory);
-        TargetCommand cmd = configFactory.makeCommand(ctx1);
+        QueryConfigCommand queryConfigCommand = new QueryConfigCommand(responseBuilderFactory);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
         assertNotNull(cmd);
         cmd.execute(target);
         verify(responseBuilder).setPayload(toSet);
