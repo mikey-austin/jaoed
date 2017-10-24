@@ -44,14 +44,14 @@ public class QueryConfigPayloadTest {
         assertNotNull(queryConfig2);
         LOG.info("parsed query config: {}", queryConfig2);
 
-        QueryConfigPayload.QueryConfigPayloadHeader header = queryConfig.getHeader();
-        QueryConfigPayload.QueryConfigPayloadHeader header2 = queryConfig2.getHeader();
+        QueryConfigPayload.Header header = queryConfig.getHeader();
+        QueryConfigPayload.Header header2 = queryConfig2.getHeader();
         assertTrue(header.equals(header2));
 
         QueryConfigPayload.Builder builder2 = queryConfig.getBuilder();
         QueryConfigPayload queryConfig3 = builder2.build();
         LOG.info("3rd built query config: {}", queryConfig3);
-        QueryConfigPayload.QueryConfigPayloadHeader header3 = queryConfig3.getHeader();
+        QueryConfigPayload.Header header3 = queryConfig3.getHeader();
         assertTrue(header.equals(header3));
     }
 }

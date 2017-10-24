@@ -15,7 +15,7 @@ import static org.pcap4j.util.ByteArrays.*;
 import org.jaoed.packet.namednumber.*;
 
 public final class QueryConfigPayload extends AbstractPacket {
-    private final QueryConfigPayloadHeader header;
+    private final Header header;
     private final Packet payload;
 
     public static QueryConfigPayload newPacket(Packet payload) throws IllegalRawDataException {
@@ -33,7 +33,7 @@ public final class QueryConfigPayload extends AbstractPacket {
     private QueryConfigPayload(byte[] rawData, int offset, int length)
         throws IllegalRawDataException {
 
-        this.header = new QueryConfigPayloadHeader(rawData, offset, length);
+        this.header = new Header(rawData, offset, length);
 
         // We don't use packet factories, so just put the rest as an
         // unknown packet.
@@ -51,14 +51,14 @@ public final class QueryConfigPayload extends AbstractPacket {
     }
 
     private QueryConfigPayload(Builder builder) {
-        this.header = new QueryConfigPayloadHeader(builder);
+        this.header = new Header(builder);
         this.payload = builder.payloadBuilder != null
             ? builder.payloadBuilder.build()
             : null;
     }
 
     @Override
-    public QueryConfigPayloadHeader getHeader() {
+    public Header getHeader() {
         return header;
     }
 
@@ -84,7 +84,7 @@ public final class QueryConfigPayload extends AbstractPacket {
         public Builder() {}
 
         private Builder(QueryConfigPayload packet) {
-            QueryConfigPayloadHeader header = packet.getHeader();
+            Header header = packet.getHeader();
             this.bufferCount = header.bufferCount;
             this.firmwareVersion = header.firmwareVersion;
             this.sectorCount = header.sectorCount;
@@ -149,7 +149,7 @@ public final class QueryConfigPayload extends AbstractPacket {
         }
     }
 
-    public static final class QueryConfigPayloadHeader extends AbstractHeader {
+    public static final class Header extends AbstractHeader {
         private static final int QUERY_CONFIG_SIZE = 8;
 
         private static final int BUFFER_COUNT_OFFSET = 0;
@@ -174,7 +174,7 @@ public final class QueryConfigPayload extends AbstractPacket {
         private QueryConfigSubCommand subCommand;
         private short configStringLength = 0;
 
-        private QueryConfigPayloadHeader(byte[] rawData, int offset, int length) throws IllegalRawDataException {
+        private Header(byte[] rawData, int offset, int length) throws IllegalRawDataException {
             if (length < QUERY_CONFIG_SIZE) {
                 StringBuilder sb = new StringBuilder(200);
                 sb.append("The data is too short to build a QueryConfigPayload header (")
@@ -201,7 +201,7 @@ public final class QueryConfigPayload extends AbstractPacket {
             this.configStringLength = ByteArrays.getShort(rawData, CONFIG_STR_LEN_OFFSET + offset);
         }
 
-        private QueryConfigPayloadHeader(Builder builder) {
+        private Header(Builder builder) {
             this.bufferCount = builder.bufferCount;
             this.firmwareVersion = builder.firmwareVersion;
             this.sectorCount = builder.sectorCount;
@@ -292,7 +292,7 @@ public final class QueryConfigPayload extends AbstractPacket {
             if (!this.getClass().isInstance(obj))
                 return false;
 
-            QueryConfigPayloadHeader other = (QueryConfigPayloadHeader) obj;
+            Header other = (Header) obj;
             return
                 bufferCount == other.bufferCount
                 && firmwareVersion == other.firmwareVersion
