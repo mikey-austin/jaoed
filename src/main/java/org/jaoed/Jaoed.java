@@ -12,6 +12,7 @@ public class Jaoed {
     public static void main(String[] args) {
         try {
             App app = new ConfigAppBuilder(args[0]).build();
+            Runtime.getRuntime().addShutdownHook(new Thread(app::stop));
             app.start();
         } catch (Exception e) {
             LOG.error("an error occured whilst starting the application", e);
