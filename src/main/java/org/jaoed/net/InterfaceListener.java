@@ -5,6 +5,7 @@ import java.lang.Runnable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -23,6 +24,7 @@ import org.jaoed.service.Service;
 
 public class InterfaceListener implements Runnable, Service {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceListener.class);
+    private static final int ifacePollMs = 1000; // TODO: make configurable.
 
     private final Thread listenerThread;
     private final Interface iface;
@@ -35,6 +37,7 @@ public class InterfaceListener implements Runnable, Service {
         this(iface, processorRegistry, _iface -> {
                 try {
                     PcapHandle handle = new PcapHandle.Builder(_iface.getName())
+                        .timeoutMillis(ifacePollMs)
                         .build();
                     handle.setFilter("ether proto 0x88A2", BpfProgram.BpfCompileMode.OPTIMIZE);
                     return handle;
@@ -71,6 +74,7 @@ public class InterfaceListener implements Runnable, Service {
 
     @Override
     public void stop() {
+        LOG.info("stopping {} listener thread", this);
         this.running = false;
         try {
             listenerThread.join();
@@ -81,6 +85,7 @@ public class InterfaceListener implements Runnable, Service {
 
     @Override
     public void run() {
+        LOG.info("starting {} listener thread [poll = {}ms]", this, ifacePollMs);
         running = true;
         while (running) {
             try {
@@ -98,6 +103,9 @@ public class InterfaceListener implements Runnable, Service {
                     .orElseThrow(
                         () -> new Exception("no processor for " + ctx.toString()));
                 processor.enqueue(ctx);
+            } catch (TimeoutException e) {
+                // Nothing received, carry on.
+                LOG.trace("iface listener " + this.toString() + " timed out");
             } catch (EOFException e) {
                 LOG.info("received EOF in {} listener", this);
                 running = false;

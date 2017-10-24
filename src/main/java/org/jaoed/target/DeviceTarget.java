@@ -51,6 +51,9 @@ public class DeviceTarget implements PacketProcessor, Runnable, Service {
 
     @Override
     public void run() {
+        LOG.info("starting target {} thread [queue = {}; poll = {}ms]",
+                 deviceConfig.getTarget(), inputQueue.size(), pollInterval);
+
         this.running = true;
         while (running) {
             try {
@@ -88,6 +91,7 @@ public class DeviceTarget implements PacketProcessor, Runnable, Service {
 
     @Override
     public void stop() {
+        LOG.info("stopping target {} thread", deviceConfig.getTarget());
         this.running = false;
         try {
             deviceThread.join();
