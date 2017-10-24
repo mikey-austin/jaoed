@@ -25,17 +25,17 @@ import org.jaoed.service.Service;
 
 public class InterfaceListener implements Runnable, Service {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceListener.class);
-    private static final int ifacePollMs = 1000; // TODO: make configurable.
 
     private final Thread listenerThread;
     private final Interface iface;
     private final PcapHandle handle;
     private final ProcessorRegistry processorRegistry;
     private final Consumer<Packet> sender;
+    private final int ifacePollMs;
     private volatile boolean running;
 
-    public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry) throws Exception {
-        this(iface, processorRegistry, _iface -> {
+    public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry, int ifacePollMs) throws Exception {
+        this(iface, processorRegistry, ifacePollMs, _iface -> {
                 try {
                     PcapHandle handle = new PcapHandle.Builder(_iface.getName())
                         .timeoutMillis(ifacePollMs)
@@ -49,13 +49,14 @@ public class InterfaceListener implements Runnable, Service {
             });
     }
 
-    public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry,
+    public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry, int ifacePollMs,
                              Function<Interface, PcapHandle> handleFactory) throws Exception {
 
         if ((this.handle = handleFactory.apply(iface)) == null) {
             throw new Exception("could not create pcap handle");
         }
         this.iface = iface;
+        this.ifacePollMs = ifacePollMs;
         this.running = false;
         this.processorRegistry = processorRegistry;
         this.listenerThread = new Thread(this);
@@ -107,7 +108,6 @@ public class InterfaceListener implements Runnable, Service {
                     p -> p.enqueue(ctx));
             } catch (TimeoutException e) {
                 // Nothing received, carry on.
-                LOG.trace("iface listener " + this.toString() + " timed out");
             } catch (EOFException e) {
                 LOG.info("received EOF in {} listener", this);
                 running = false;

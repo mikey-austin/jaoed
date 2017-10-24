@@ -86,7 +86,9 @@ public class AoeFrame extends AbstractPacket {
         private byte[] tag;
         private AbstractPacket.Builder payloadBuilder;
 
-        public Builder() {}
+        public Builder() {
+            tag = new byte[] { 0x0, 0x0, 0x0, 0x0 };
+        }
 
         private Builder(AoeFrame packet) {
             this.version = packet.header.version;
@@ -98,7 +100,11 @@ public class AoeFrame extends AbstractPacket {
             this.majorNumber = packet.header.majorNumber;
             this.minorNumber = packet.header.minorNumber;
             this.command = packet.header.command;
-            this.tag = packet.header.tag;
+            if (packet.header.tag != null && packet.header.tag.length == 4) {
+                this.tag = packet.header.tag;
+            } else {
+                this.tag = new byte[] { 0x0, 0x0, 0x0, 0x0 };
+            }
             if (packet.payload != null)
                 this.payloadBuilder = packet.payload.getBuilder();
         }

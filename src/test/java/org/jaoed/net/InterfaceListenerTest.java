@@ -50,7 +50,7 @@ public class InterfaceListenerTest {
         when(iface.getName()).thenReturn("eth0");
 
         InterfaceListener listener = new InterfaceListener(
-            iface, processorRegistry, iface -> {
+            iface, processorRegistry, 1000, iface -> {
                 try {
                     return Pcaps.openOffline(file);
                 } catch (Exception e) {

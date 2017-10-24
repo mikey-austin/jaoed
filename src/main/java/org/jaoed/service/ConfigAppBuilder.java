@@ -45,10 +45,12 @@ public class ConfigAppBuilder implements AppBuilder {
             outputQueueSize, senderPollMs, poolSize);
         services.add(sender);
 
+        // TODO: make configurable per iface section.
+        int ifacePollMs = 1000;
         TargetRegistry targetRegistry = new TargetRegistry();
         for (Interface iface : config.getInterfaces()) {
             services.add(
-                new InterfaceListener(iface, targetRegistry));
+                new InterfaceListener(iface, targetRegistry, ifacePollMs));
         }
 
         // TODO: add more commands here.
@@ -70,6 +72,7 @@ public class ConfigAppBuilder implements AppBuilder {
                 .setCommandFactory(commandDispatcher)
                 .setConfigArea(new DeviceConfigArea())
                 .build();
+            targetRegistry.addTarget(target);
             services.add(target);
         }
 

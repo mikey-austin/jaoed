@@ -45,7 +45,9 @@ public class QueryConfigResponse implements TargetResponse {
     @Override
     public void sendResponse() {
         // Build and send off the response.
-        ctx.getSender().accept(makeResponse());
+        Packet response = makeResponse();
+        LOG.trace("sending response payload: {}", response);
+        ctx.getSender().accept(response);
     }
 
     public Packet makeResponse() {
@@ -55,7 +57,7 @@ public class QueryConfigResponse implements TargetResponse {
                 .sectorCount(target.getSectorCount())
                 .bufferCount(target.getBufferCount())
                 .aoeProtocolVersion(AoeVersion.SUPPORTED);
-            if (payload != null) {
+            if (payload != null && payload.length > 0) {
                 config
                     .configStringLength((short) payload.length)
                     .payloadBuilder(
