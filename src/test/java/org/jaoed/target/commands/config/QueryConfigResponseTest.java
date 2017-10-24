@@ -16,6 +16,7 @@ import org.pcap4j.packet.UnknownPacket;
 import org.pcap4j.packet.namednumber.EtherType;
 import org.pcap4j.util.MacAddress;
 
+import org.jaoed.config.Device;
 import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.QueryConfigPayload;
@@ -25,6 +26,7 @@ import org.jaoed.target.CommandFactory;
 import org.jaoed.target.DeviceTarget;
 import org.jaoed.target.TargetCommand;
 import org.jaoed.target.TargetResponse;
+import static org.jaoed.target.TargetUtils.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QueryConfigResponseTest {
@@ -55,9 +57,15 @@ public class QueryConfigResponseTest {
                 MacAddress.getByName("de:ad:be:ef:00:02"))
             .build();
 
+        int shelf = 123, slot = 37;
+        Device device = new Device()
+            .setShelf(shelf)
+            .setSlot(slot);
+
         when(target.getFirmwareVersion()).thenReturn((short) 1);
         when(target.getSectorCount()).thenReturn((byte) 2);
         when(target.getBufferCount()).thenReturn((short) 3);
+        when(target.getDevice()).thenReturn(device);
         when(ctx.getAoeFrame()).thenReturn(aoeFrame);
         when(ctx.getEthernetFrame()).thenReturn(ethFrame);
 
@@ -79,6 +87,8 @@ public class QueryConfigResponseTest {
         assertNotNull(innerAoe);
         assertTrue(innerAoe.getHeader().getResponseFlag());
         assertFalse(innerAoe.getHeader().getResponseErrorFlag());
+        assertEquals(shelf, encodeMajor(innerAoe.getHeader().getMajorNumber()));
+        assertEquals(slot, encodeMinor(innerAoe.getHeader().getMinorNumber()));
 
         QueryConfigPayload innerCmd = QueryConfigPayload.newPacket(innerAoe.getPayload());
         assertNotNull(innerCmd);

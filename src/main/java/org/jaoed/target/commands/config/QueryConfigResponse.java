@@ -73,6 +73,8 @@ public class QueryConfigResponse implements TargetResponse {
                 .getAoeFrame()
                 .getBuilder()
                 .responseFlag(true)
+                .majorNumber(target.getDevice().getShelf())
+                .minorNumber(target.getDevice().getSlot())
                 .payloadBuilder(config);
             if (error != null) {
                 aoe.error(error);

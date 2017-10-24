@@ -1,5 +1,6 @@
 package org.jaoed.net;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class InterfaceListenerTest {
             return true;
         };
         when(processorRegistry.lookup(any()))
-            .thenReturn(Optional.of(processor));
+            .thenReturn(Optional.of(Collections.singletonList(processor)));
         when(iface.getName()).thenReturn("eth0");
 
         InterfaceListener listener = new InterfaceListener(

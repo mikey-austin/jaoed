@@ -3,6 +3,7 @@ package org.jaoed.net;
 import java.io.EOFException;
 import java.lang.Runnable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
@@ -98,11 +99,12 @@ public class InterfaceListener implements Runnable, Service {
                 LOG.trace("received {} frame at {}: {}",
                     handle, handle.getTimestamp(), ctx);
 
-                PacketProcessor processor = processorRegistry
+                List<PacketProcessor> processors = processorRegistry
                     .lookup(ctx)
                     .orElseThrow(
                         () -> new Exception("no processor for " + ctx.toString()));
-                processor.enqueue(ctx);
+                processors.forEach(
+                    p -> p.enqueue(ctx));
             } catch (TimeoutException e) {
                 // Nothing received, carry on.
                 LOG.trace("iface listener " + this.toString() + " timed out");

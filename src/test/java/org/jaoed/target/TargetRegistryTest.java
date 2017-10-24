@@ -1,5 +1,7 @@
 package org.jaoed.target;
 
+import java.util.List;
+
 import org.mockito.*;
 import org.mockito.runners.*;
 import static org.mockito.Mockito.*;
@@ -45,5 +47,9 @@ public class TargetRegistryTest {
         short encodedMajor = encodeMajor(major);
         byte encodedMinor = encodeMinor(minor);
         assertTrue(registry.lookup(encodedMajor, encodedMinor).isPresent());
+
+        // Test broadcast.
+        assertTrue(registry.lookup(encodeMajor(0xFFFF), encodeMinor(0xFF)).isPresent());
+        assertEquals(1, registry.lookup((short) 0xFFFF, (byte) 0xFF).orElse(null).size());
     }
 }

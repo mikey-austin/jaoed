@@ -13,6 +13,7 @@ import org.pcap4j.util.MacAddress;
 import static org.pcap4j.util.ByteArrays.*;
 
 import org.jaoed.packet.namednumber.*;
+import static org.jaoed.target.TargetUtils.*;
 
 public class AoeFrame extends AbstractPacket {
     private final AoeHeader header;
@@ -136,9 +137,17 @@ public class AoeFrame extends AbstractPacket {
             return this;
         }
 
+        public Builder majorNumber(int majorNumber) {
+            return majorNumber(encodeMajor(majorNumber));
+        }
+
         public Builder majorNumber(short majorNumber) {
             this.majorNumber = majorNumber;
             return this;
+        }
+
+        public Builder minorNumber(int minorNumber) {
+            return minorNumber(encodeMinor(minorNumber));
         }
 
         public Builder minorNumber(byte minorNumber) {
