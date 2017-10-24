@@ -46,9 +46,10 @@ public class ConfigAppBuilder implements AppBuilder {
         services.add(sender);
 
         TargetRegistry targetRegistry = new TargetRegistry();
-        config.getInterfaces().stream()
-            .map(iface -> new InterfaceListener(iface, targetRegistry))
-            .forEach(services::add);
+        for (Interface iface : config.getInterfaces()) {
+            services.add(
+                new InterfaceListener(iface, targetRegistry));
+        }
 
         // TODO: add more commands here.
         CommandFactory commandDispatcher = CommandDispatcher

@@ -46,13 +46,16 @@ public class InterfaceListenerTest {
         };
         when(processorRegistry.lookup(any()))
             .thenReturn(Optional.of(processor));
-
-        PcapHandle handle = Pcaps.openOffline(file);
         when(iface.getName()).thenReturn("eth0");
-        when(iface.getPcapHandle()).thenReturn(handle);
 
         InterfaceListener listener = new InterfaceListener(
-            iface, processorRegistry);
+            iface, processorRegistry, iface -> {
+                try {
+                    return Pcaps.openOffline(file);
+                } catch (Exception e) {
+                    return null;
+                }
+            });
 
         listener.start();
         Thread.sleep(1000);

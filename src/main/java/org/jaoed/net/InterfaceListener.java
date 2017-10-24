@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.pcap4j.core.PcapHandle;
 import org.pcap4j.packet.Packet;
@@ -29,9 +30,24 @@ public class InterfaceListener implements Runnable, Service {
     private final Consumer<Packet> sender;
     private volatile boolean running;
 
-    public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry) {
+    public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry) throws Exception {
+        this(iface, processorRegistry, _iface -> {
+                try {
+                    return new PcapHandle.Builder(_iface.getName()).build();
+                } catch (Exception e) {
+                    LOG.error("could not create pcap handle", e);
+                    return null;
+                }
+            });
+    }
+
+    public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry,
+                             Function<Interface, PcapHandle> handleFactory) throws Exception {
+
+        if ((this.handle = handleFactory.apply(iface)) == null) {
+            throw new Exception("could not create pcap handle");
+        }
         this.iface = iface;
-        this.handle = iface.getPcapHandle();
         this.running = false;
         this.processorRegistry = processorRegistry;
         this.listenerThread = new Thread(this);
