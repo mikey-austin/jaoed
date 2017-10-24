@@ -28,10 +28,12 @@ public class DeviceTarget implements PacketProcessor, Runnable, Service {
     private final ConfigArea configArea;
     private final short firmwareVersion;
     private final byte sectorCount;
+    private final int inputQueueSize;
 
     private volatile boolean running;
 
     private DeviceTarget(Builder builder) {
+        this.inputQueueSize = builder.inputQueueSize;
         this.inputQueue = new ArrayBlockingQueue<>(builder.inputQueueSize);
         this.responseProcessor = builder.responseProcessor;
         this.deviceConfig = builder.deviceConfig;
@@ -52,7 +54,7 @@ public class DeviceTarget implements PacketProcessor, Runnable, Service {
     @Override
     public void run() {
         LOG.info("starting target {} thread [queue = {}; poll = {}ms]",
-                 deviceConfig.getTarget(), inputQueue.size(), pollInterval);
+                 deviceConfig.getTarget(), inputQueueSize, pollInterval);
 
         this.running = true;
         while (running) {
@@ -77,7 +79,7 @@ public class DeviceTarget implements PacketProcessor, Runnable, Service {
     }
 
     public short getBufferCount() {
-        return (short) inputQueue.size();
+        return (short) inputQueueSize;
     }
 
     public Device getDevice() {

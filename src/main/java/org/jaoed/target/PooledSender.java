@@ -18,13 +18,15 @@ public class PooledSender implements ResponseProcessor, Service, Runnable {
     private final Thread senderThread;
     private final BlockingQueue<TargetResponse> outputQueue;
     private final ExecutorService threadPool;
+    private final int outputQueueSize;
     private final int pollInterval;
     private final int poolSize;
 
     private volatile boolean running;
 
-    public PooledSender(int queueSize, int pollInterval, int poolSize) {
-        this.outputQueue = new ArrayBlockingQueue<>(queueSize);
+    public PooledSender(int outputQueueSize, int pollInterval, int poolSize) {
+        this.outputQueue = new ArrayBlockingQueue<>(outputQueueSize);
+        this.outputQueueSize = outputQueueSize;
         this.running = false;
         this.pollInterval = pollInterval;
         this.threadPool = Executors.newFixedThreadPool(poolSize);
@@ -34,7 +36,7 @@ public class PooledSender implements ResponseProcessor, Service, Runnable {
 
     @Override
     public void run() {
-        LOG.info("starting pooled sender [queue = {}; pool = {}]",outputQueue.size(), poolSize);
+        LOG.info("starting pooled sender [queue = {}; pool = {}]", outputQueueSize, poolSize);
 
         while (running) {
             try {
