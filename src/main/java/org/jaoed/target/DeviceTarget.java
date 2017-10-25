@@ -104,8 +104,10 @@ public class DeviceTarget implements PacketProcessor, Runnable, Service {
 
     @Override
     public boolean enqueue(RequestContext ctx) {
-        return inputQueue.offer(
-            commandFactory.makeCommand(ctx));
+        return commandFactory
+            .makeCommand(ctx)
+            .map(inputQueue::offer)
+            .orElse(false);
     }
 
     public ConfigArea getConfigArea() {
@@ -134,7 +136,7 @@ public class DeviceTarget implements PacketProcessor, Runnable, Service {
             this.commandFactory = null;
             this.configArea = null;
             this.sectorCount = 0;
-            this.firmwareVersion = 0;
+            this.firmwareVersion = 1;
         }
 
         public Builder setResponseProcessor(ResponseProcessor responseProcessor) {

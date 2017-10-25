@@ -1,5 +1,7 @@
 package org.jaoed.target.commands.config;
 
+import java.util.Arrays;
+
 import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.UnknownPacket;
@@ -13,6 +15,7 @@ import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.QueryConfigPayload;
 import org.jaoed.packet.namednumber.AoeError;
+import org.jaoed.target.ConfigArea;
 import org.jaoed.target.DeviceTarget;
 import org.jaoed.target.TargetCommand;
 import org.jaoed.target.TargetResponse;
@@ -57,18 +60,16 @@ public class QueryConfigResponse implements TargetResponse {
                 .sectorCount(target.getSectorCount())
                 .bufferCount(target.getBufferCount())
                 .aoeProtocolVersion(AoeVersion.SUPPORTED);
-            if (payload != null && payload.length > 0) {
-                config
-                    .configStringLength((short) payload.length)
-                    .payloadBuilder(
-                        new UnknownPacket.Builder().rawData(payload));
-            }
+            config.configStringLength((short) payload.length)
+                .payloadBuilder(
+                    new UnknownPacket.Builder().rawData(
+                        Arrays.copyOf(payload, ConfigArea.MAX_LENGTH)));
 
             if (ctx.getAoeFrame().getPayload() != null) {
                 QueryConfigPayload requestConfig = QueryConfigPayload.newPacket(
                     ctx.getAoeFrame().getPayload());
                 config.subCommand(
-                    requestConfig.getHeader().getSubCommand());
+                   requestConfig.getHeader().getSubCommand());
             }
 
             AoeFrame.Builder aoe = ctx
@@ -79,6 +80,7 @@ public class QueryConfigResponse implements TargetResponse {
                 .minorNumber(target.getDevice().getSlot())
                 .payloadBuilder(config);
             if (error != null) {
+                aoe.responseErrorFlag(true);
                 aoe.error(error);
             }
 

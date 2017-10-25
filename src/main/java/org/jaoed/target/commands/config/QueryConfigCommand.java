@@ -42,23 +42,31 @@ public class QueryConfigCommand implements CommandFactory {
     }
 
     @Override
-    public TargetCommand makeCommand(RequestContext ctx) {
+    public Optional<TargetCommand> makeCommand(RequestContext ctx) {
         try {
             QueryConfigPayload query = QueryConfigPayload.newPacket(
                 ctx.getAoeFrame().getPayload());
             return Optional
                 .ofNullable(
                     dispatch.get(query.getHeader().getSubCommand()))
-                .orElseThrow(
-                    () -> new IllegalArgumentException("no sub-command found"))
-                .apply(ctx, query);
+                .map(subCmd -> subCmd.apply(ctx, query));
         } catch (Exception e) {
             LOG.error("could not make query config command", e);
         }
 
-        return target -> queryConfigResponseFactory
+        return Optional.of(
+            target -> error(target, ctx, AoeError.CMD_UNKNOWN));
+    }
+
+    private TargetResponse error(DeviceTarget target, RequestContext ctx, AoeError errorCode) {
+        ConfigArea configArea = target.getConfigArea();
+        QueryConfigResponse response = queryConfigResponseFactory
             .apply(ctx, target)
-            .setError(AoeError.CMD_UNKNOWN);
+            .setError(errorCode);
+        if (!configArea.isEmpty()) {
+            response.setPayload(configArea.getConfig());
+        }
+        return response;
     }
 
     public TargetCommand readConfig(RequestContext ctx, QueryConfigPayload query) {
@@ -77,7 +85,7 @@ public class QueryConfigCommand implements CommandFactory {
         return target -> {
             ConfigArea configArea = target.getConfigArea();
             byte[] queryString = query.getPayload().getRawData();
-            if (configArea.isCompleteMatch(queryString)) {
+            if (configArea.isCompleteMatch(queryString, query.getHeader().getConfigStringLength())) {
                 LOG.debug("full config string match for device {}", target);
                 QueryConfigResponse response = queryConfigResponseFactory.apply(ctx, target);
                 if (!configArea.isEmpty()) {
@@ -87,7 +95,7 @@ public class QueryConfigCommand implements CommandFactory {
             }
 
             LOG.debug("full config string *mismatch* for device {}", target);
-            return null;
+            return error(target, ctx, AoeError.CANNOT_SET_CONFIG);
         };
     }
 
@@ -95,7 +103,7 @@ public class QueryConfigCommand implements CommandFactory {
         return target -> {
             ConfigArea configArea = target.getConfigArea();
             byte[] queryString = query.getPayload().getRawData();
-            if (configArea.isPrefixMatch(queryString)) {
+            if (configArea.isPrefixMatch(queryString, query.getHeader().getConfigStringLength())) {
                 LOG.debug("prefix match for device {}", target);
                 QueryConfigResponse response = queryConfigResponseFactory.apply(ctx, target);
                 if (!configArea.isEmpty()) {
@@ -105,7 +113,7 @@ public class QueryConfigCommand implements CommandFactory {
             }
 
             LOG.debug("prefix *mismatch* for device {}", target);
-            return null;
+            return error(target, ctx, AoeError.CANNOT_SET_CONFIG);
         };
     }
 
@@ -114,15 +122,15 @@ public class QueryConfigCommand implements CommandFactory {
             ConfigArea configArea = target.getConfigArea();
             if (configArea.isEmpty()) {
                 byte[] toSet = query.getPayload().getRawData();
-                configArea.setConfig(toSet);
-                LOG.debug("setting config string of {} bytes for device {}", toSet.length, target);
+                configArea.setConfig(toSet, query.getHeader().getConfigStringLength());
+                LOG.debug("setting config string of {} bytes for device {}",
+                          query.getHeader().getConfigStringLength(), target);
                 return queryConfigResponseFactory.apply(ctx, target)
-                    .setPayload(toSet);
-            } else {
-                LOG.debug("refusing to overwrite config string for device {}", target);
-                return queryConfigResponseFactory.apply(ctx, target)
-                    .setError(AoeError.CANNOT_SET_CONFIG);
+                    .setPayload(configArea.getConfig());
             }
+
+            LOG.debug("refusing to overwrite config string for device {}", target);
+            return error(target, ctx, AoeError.CANNOT_SET_CONFIG);
         };
     }
 
@@ -130,10 +138,11 @@ public class QueryConfigCommand implements CommandFactory {
         return target -> {
             ConfigArea configArea = target.getConfigArea();
             byte[] toSet = query.getPayload().getRawData();
-            configArea.setConfig(toSet);
-            LOG.debug("force setting config string of {} bytes for device {}", toSet.length, target);
+            configArea.setConfig(toSet, query.getHeader().getConfigStringLength());
+            LOG.debug("force setting config string of {} bytes for device {}",
+                      query.getHeader().getConfigStringLength(), target);
             return queryConfigResponseFactory.apply(ctx, target)
-                .setPayload(toSet);
+                .setPayload(configArea.getConfig());
         };
     }
 }

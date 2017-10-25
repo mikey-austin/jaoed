@@ -47,16 +47,16 @@ public class QueryConfigCommandTest {
         // Test empty config string.
         byte[] configStr = new byte[] { 'a', 'b', 'c' };
         QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
-        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
         cmd.execute(target);
         verify(queryConfigResponse, never()).setPayload(configStr);
 
         // Test non-empty config string.
         DeviceConfigArea nonEmptyArea = new DeviceConfigArea();
-        nonEmptyArea.setConfig(configStr);
+        nonEmptyArea.setConfig(configStr, configStr.length);
         when(target.getConfigArea()).thenReturn(nonEmptyArea);
-        cmd = queryConfigCommand.makeCommand(ctx1);
+        cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
         cmd.execute(target);
         verify(queryConfigResponse).setPayload(configStr);
@@ -73,15 +73,16 @@ public class QueryConfigCommandTest {
 
         DeviceConfigArea nonEmptyArea = new DeviceConfigArea();
         byte[] configStr = new byte[] { 'a', 'b', 'c' };
-        nonEmptyArea.setConfig(configStr);
+        nonEmptyArea.setConfig(configStr, configStr.length);
         when(target.getConfigArea()).thenReturn(nonEmptyArea);
         when(a1.getPayload()).thenReturn(query);
         when(ctx1.getAoeFrame()).thenReturn(a1);
+        when(queryConfigResponse.setError(any())).thenReturn(queryConfigResponse);
         when(queryConfigResponseFactory.apply(ctx1, target)).thenReturn(queryConfigResponse);
 
         // Test that the full payload is returned in the response.
         QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
-        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
         assertEquals(queryConfigResponse, cmd.execute(target));
         verify(queryConfigResponse, times(1)).setPayload(configStr);
@@ -94,10 +95,11 @@ public class QueryConfigCommandTest {
                 new UnknownPacket.Builder().rawData(toMismatch))
             .build();
         when(a1.getPayload()).thenReturn(query);
-        cmd = queryConfigCommand.makeCommand(ctx1);
+        cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
-        assertNull(cmd.execute(target));
-        verify(queryConfigResponse, times(1)).setPayload(configStr); // ie was not called again.
+        assertNotNull(cmd.execute(target));
+        verify(queryConfigResponse, times(2)).setPayload(configStr);
+        verify(queryConfigResponse, times(2)).setError(any());
     }
 
     @Test
@@ -111,15 +113,16 @@ public class QueryConfigCommandTest {
 
         DeviceConfigArea nonEmptyArea = new DeviceConfigArea();
         byte[] configStr = new byte[] { 'a', 'b', 'c', 'd' };
-        nonEmptyArea.setConfig(configStr);
+        nonEmptyArea.setConfig(configStr, configStr.length);
         when(target.getConfigArea()).thenReturn(nonEmptyArea);
         when(a1.getPayload()).thenReturn(query);
         when(ctx1.getAoeFrame()).thenReturn(a1);
+        when(queryConfigResponse.setError(any())).thenReturn(queryConfigResponse);
         when(queryConfigResponseFactory.apply(ctx1, target)).thenReturn(queryConfigResponse);
 
         // Test that the full payload is returned in the response.
         QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
-        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
         assertEquals(queryConfigResponse, cmd.execute(target));
         verify(queryConfigResponse, times(1)).setPayload(configStr);
@@ -132,10 +135,10 @@ public class QueryConfigCommandTest {
                 new UnknownPacket.Builder().rawData(toMismatch))
             .build();
         when(a1.getPayload()).thenReturn(query);
-        cmd = queryConfigCommand.makeCommand(ctx1);
+        cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
-        assertNull(cmd.execute(target));
-        verify(queryConfigResponse, times(1)).setPayload(configStr); // ie was not called again.
+        assertNotNull(cmd.execute(target));
+        verify(queryConfigResponse, times(2)).setPayload(configStr);
     }
 
     @Test
@@ -145,6 +148,7 @@ public class QueryConfigCommandTest {
             .subCommand(QueryConfigSubCommand.SET_IF_EMPTY)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toSet))
+            .configStringLength((short) toSet.length)
             .build();
 
         DeviceConfigArea emptyArea = new DeviceConfigArea();
@@ -154,7 +158,7 @@ public class QueryConfigCommandTest {
         when(queryConfigResponseFactory.apply(ctx1, target)).thenReturn(queryConfigResponse);
 
         QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
-        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
         cmd.execute(target);
         verify(queryConfigResponse).setPayload(toSet);
@@ -168,20 +172,22 @@ public class QueryConfigCommandTest {
             .subCommand(QueryConfigSubCommand.SET_IF_EMPTY)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toSet))
+            .configStringLength((short) toSet.length)
             .build();
 
         DeviceConfigArea nonEmptyArea = new DeviceConfigArea();
-        nonEmptyArea.setConfig(toSet);
+        nonEmptyArea.setConfig(toSet, toSet.length);
         when(target.getConfigArea()).thenReturn(nonEmptyArea);
         when(a1.getPayload()).thenReturn(query);
         when(ctx1.getAoeFrame()).thenReturn(a1);
+        when(queryConfigResponse.setError(any())).thenReturn(queryConfigResponse);
         when(queryConfigResponseFactory.apply(ctx1, target)).thenReturn(queryConfigResponse);
 
         QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
-        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
         cmd.execute(target);
-        verify(queryConfigResponse, never()).setPayload(toSet);
+        verify(queryConfigResponse).setError(any());
         verify(queryConfigResponse).setError(AoeError.CANNOT_SET_CONFIG);
     }
 
@@ -192,6 +198,7 @@ public class QueryConfigCommandTest {
             .subCommand(QueryConfigSubCommand.SET_FORCE)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toSet))
+            .configStringLength((short) toSet.length)
             .build();
 
         DeviceConfigArea emptyArea = new DeviceConfigArea();
@@ -201,7 +208,7 @@ public class QueryConfigCommandTest {
         when(queryConfigResponseFactory.apply(ctx1, target)).thenReturn(queryConfigResponse);
 
         QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
-        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
         cmd.execute(target);
         verify(queryConfigResponse).setPayload(toSet);

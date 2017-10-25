@@ -1,5 +1,6 @@
 package org.jaoed.target;
 
+import java.util.Optional;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,11 +28,11 @@ public class CommandDispatcher implements CommandFactory {
     }
 
     @Override
-    public TargetCommand makeCommand(RequestContext ctx) {
+    public Optional<TargetCommand> makeCommand(RequestContext ctx) {
         AoeCommand command = ctx.getAoeFrame().getHeader().getCommand();
         if (!commandFactories.containsKey(command)) {
             LOG.warn("unknown command type ({}) requested", command);
-            return null;
+            return Optional.empty();
         }
 
         return commandFactories

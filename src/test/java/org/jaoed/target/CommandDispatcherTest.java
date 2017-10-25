@@ -1,17 +1,24 @@
 package org.jaoed.target;
 
 import java.util.HashMap;
+import java.util.Optional;
 
+import org.mockito.*;
+import org.mockito.runners.*;
 import static org.mockito.Mockito.*;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.namednumber.AoeCommand;
 
+@RunWith(MockitoJUnitRunner.class)
 public class CommandDispatcherTest {
+    @Mock TargetCommand dummyCommand;
+
     @Test
     public void testDispatcher() {
         HashMap<String, String> results = new HashMap<>();
@@ -21,26 +28,26 @@ public class CommandDispatcherTest {
             .addCommandFactory(
                 AoeCommand.ISSUE_ATA, ctx -> {
                     results.put("first", "called");
-                    return null;
+                    return Optional.of(dummyCommand);
                 })
             .addCommandFactory(
                 AoeCommand.QUERY_CONFIG, ctx -> {
                     results.put("second", "called next");
-                    return null;
+                    return Optional.of(dummyCommand);
                 })
             .build();
         assertNotNull(dispatcher);
 
         // Test first.
-        dispatcher.makeCommand(wrap(AoeCommand.ISSUE_ATA));
+        assertTrue(dispatcher.makeCommand(wrap(AoeCommand.ISSUE_ATA)).isPresent());
         assertEquals("called", results.get("first"));
 
         // Test second.
-        dispatcher.makeCommand(wrap(AoeCommand.QUERY_CONFIG));
+        assertTrue(dispatcher.makeCommand(wrap(AoeCommand.QUERY_CONFIG)).isPresent());
         assertEquals("called next", results.get("second"));
 
         // Test non-existant command.
-        assertNull(dispatcher.makeCommand(wrap(AoeCommand.RESERVE_RELEASE)));
+        assertFalse(dispatcher.makeCommand(wrap(AoeCommand.RESERVE_RELEASE)).isPresent());
     }
 
     private static RequestContext wrap(AoeCommand cmd) {

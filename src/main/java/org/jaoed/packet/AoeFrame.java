@@ -241,10 +241,10 @@ public class AoeFrame extends AbstractPacket {
 
             byte versionFlags = ByteArrays.getByte(rawData, VERSION_FLAGS_OFFSET + offset);
             this.version = (byte) (versionFlags >>> 4);
-            this.responseFlag = ((versionFlags & 0x01) == 0x01 ? true : false);
-            this.responseErrorFlag = ((versionFlags & 0x02) == 0x02 ? true : false);
-            this.reserved1Flag = ((versionFlags & 0x04) == 0x04 ? true : false);
-            this.reserved2Flag = ((versionFlags & 0x08) == 0x04 ? true : false);
+            this.responseFlag = ((versionFlags & 0x08) == 0x08 ? true : false);
+            this.responseErrorFlag = ((versionFlags & 0x04) == 0x04 ? true : false);
+            this.reserved1Flag = ((versionFlags & 0x02) == 0x02 ? true : false);
+            this.reserved2Flag = ((versionFlags & 0x01) == 0x01 ? true : false);
 
             this.error = AoeError.getInstance(
                 ByteArrays.getByte(rawData, ERROR_OFFSET + offset));
@@ -315,10 +315,10 @@ public class AoeFrame extends AbstractPacket {
             List<byte[]> rawFields = new ArrayList<byte[]>();
 
             byte versionFlags = (byte) (version << 4);
-            versionFlags |= (responseFlag ? 0x01 : 0x00);
-            versionFlags |= (responseErrorFlag ? 0x02 : 0x00);
-            versionFlags |= (reserved1Flag ? 0x04 : 0x00);
-            versionFlags |= (reserved2Flag ? 0x08 : 0x00);
+            versionFlags |= (responseFlag ? 0x08 : 0x00);
+            versionFlags |= (responseErrorFlag ? 0x04 : 0x00);
+            versionFlags |= (reserved1Flag ? 0x02 : 0x00);
+            versionFlags |= (reserved2Flag ? 0x01 : 0x00);
             rawFields.add(ByteArrays.toByteArray(versionFlags));
 
             rawFields.add(
