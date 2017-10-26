@@ -58,17 +58,6 @@ public class QueryConfigCommand implements CommandFactory {
             target -> error(target, ctx, AoeError.CMD_UNKNOWN));
     }
 
-    private TargetResponse error(DeviceTarget target, RequestContext ctx, AoeError errorCode) {
-        ConfigArea configArea = target.getConfigArea();
-        QueryConfigResponse response = queryConfigResponseFactory
-            .apply(ctx, target)
-            .setError(errorCode);
-        if (!configArea.isEmpty()) {
-            response.setPayload(configArea.getConfig());
-        }
-        return response;
-    }
-
     public TargetCommand readConfig(RequestContext ctx, QueryConfigPayload query) {
         return target -> {
             LOG.debug("reading config for device {}", target);
@@ -95,7 +84,7 @@ public class QueryConfigCommand implements CommandFactory {
             }
 
             LOG.debug("full config string *mismatch* for device {}", target);
-            return error(target, ctx, AoeError.CANNOT_SET_CONFIG);
+            return null;
         };
     }
 
@@ -113,7 +102,7 @@ public class QueryConfigCommand implements CommandFactory {
             }
 
             LOG.debug("prefix *mismatch* for device {}", target);
-            return error(target, ctx, AoeError.CANNOT_SET_CONFIG);
+            return null;
         };
     }
 
@@ -144,5 +133,16 @@ public class QueryConfigCommand implements CommandFactory {
             return queryConfigResponseFactory.apply(ctx, target)
                 .setPayload(configArea.getConfig());
         };
+    }
+
+    private TargetResponse error(DeviceTarget target, RequestContext ctx, AoeError errorCode) {
+        ConfigArea configArea = target.getConfigArea();
+        QueryConfigResponse response = queryConfigResponseFactory
+            .apply(ctx, target)
+            .setError(errorCode);
+        if (!configArea.isEmpty()) {
+            response.setPayload(configArea.getConfig());
+        }
+        return response;
     }
 }

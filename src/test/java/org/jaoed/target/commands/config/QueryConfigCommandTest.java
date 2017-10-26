@@ -69,11 +69,13 @@ public class QueryConfigCommandTest {
             .subCommand(QueryConfigSubCommand.TEST_FULL_MATCH)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toMatch))
+            .configStringLength((short) toMatch.length)
             .build();
 
         DeviceConfigArea nonEmptyArea = new DeviceConfigArea();
         byte[] configStr = new byte[] { 'a', 'b', 'c' };
         nonEmptyArea.setConfig(configStr, configStr.length);
+
         when(target.getConfigArea()).thenReturn(nonEmptyArea);
         when(a1.getPayload()).thenReturn(query);
         when(ctx1.getAoeFrame()).thenReturn(a1);
@@ -97,9 +99,8 @@ public class QueryConfigCommandTest {
         when(a1.getPayload()).thenReturn(query);
         cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
-        assertNotNull(cmd.execute(target));
-        verify(queryConfigResponse, times(2)).setPayload(configStr);
-        verify(queryConfigResponse, times(2)).setError(any());
+        assertNull(cmd.execute(target));
+        verify(queryConfigResponse, times(1)).setPayload(configStr);
     }
 
     @Test
@@ -109,6 +110,7 @@ public class QueryConfigCommandTest {
             .subCommand(QueryConfigSubCommand.TEST_PREFIX_MATCH)
             .payloadBuilder(
                 new UnknownPacket.Builder().rawData(toMatch))
+            .configStringLength((short) toMatch.length)
             .build();
 
         DeviceConfigArea nonEmptyArea = new DeviceConfigArea();
@@ -126,19 +128,32 @@ public class QueryConfigCommandTest {
         assertNotNull(cmd);
         assertEquals(queryConfigResponse, cmd.execute(target));
         verify(queryConfigResponse, times(1)).setPayload(configStr);
+    }
 
-        // Test mismatch.
-        byte[] toMismatch = new byte[] { '1', '2', '3' };
-        query = new QueryConfigPayload.Builder()
+    @Test
+    public void testPrefixMismatch() {
+        byte[] toMatch = new byte[] { 'z', 'z' };
+        QueryConfigPayload query = new QueryConfigPayload.Builder()
             .subCommand(QueryConfigSubCommand.TEST_PREFIX_MATCH)
             .payloadBuilder(
-                new UnknownPacket.Builder().rawData(toMismatch))
+                new UnknownPacket.Builder().rawData(toMatch))
+            .configStringLength((short) toMatch.length)
             .build();
+
+        DeviceConfigArea nonEmptyArea = new DeviceConfigArea();
+        byte[] configStr = new byte[] { 'a', 'b', 'c', 'd' };
+        nonEmptyArea.setConfig(configStr, configStr.length);
+        when(target.getConfigArea()).thenReturn(nonEmptyArea);
         when(a1.getPayload()).thenReturn(query);
-        cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
+        when(ctx1.getAoeFrame()).thenReturn(a1);
+        when(queryConfigResponse.setError(any())).thenReturn(queryConfigResponse);
+        when(queryConfigResponseFactory.apply(ctx1, target)).thenReturn(queryConfigResponse);
+
+        // Test that the full payload is returned in the response.
+        QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
+        TargetCommand cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
-        assertNotNull(cmd.execute(target));
-        verify(queryConfigResponse, times(2)).setPayload(configStr);
+        assertNull(cmd.execute(target));
     }
 
     @Test
@@ -187,7 +202,6 @@ public class QueryConfigCommandTest {
         TargetCommand cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
         cmd.execute(target);
-        verify(queryConfigResponse).setError(any());
         verify(queryConfigResponse).setError(AoeError.CANNOT_SET_CONFIG);
     }
 
