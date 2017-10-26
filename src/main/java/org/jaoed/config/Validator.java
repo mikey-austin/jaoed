@@ -43,13 +43,13 @@ public class Validator implements ConfigVisitor {
 
         Path targetPath = FileSystems.getDefault().getPath(target);
         if (!targetPath.isAbsolute())
-            throw new ValidationException("Device target path must be absolute");
+            throw new ValidationException("Device target " + target + " path must be absolute");
 
         if (!Files.isReadable(targetPath))
-            throw new ValidationException("Device target path not readable");
+            throw new ValidationException("Device target " + target + " path not readable");
 
         if (!Files.isWritable(targetPath))
-            throw new ValidationException("Device target path not writable");
+            throw new ValidationException("Device target " + target + " path not writable");
     }
 
     @Override

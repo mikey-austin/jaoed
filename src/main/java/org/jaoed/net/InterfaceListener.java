@@ -53,9 +53,8 @@ public class InterfaceListener implements Runnable, Service {
                     LOG.error("could not create pcap handle", e);
                     return null;
                 }
-            },
-            MacAddress.getByAddress(
-                NetworkInterface.getByName(iface.getName()).getHardwareAddress()));
+             },
+             fetchIfaceHardwareAddress(iface));
     }
 
     public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry, int ifacePollMs,
@@ -132,6 +131,15 @@ public class InterfaceListener implements Runnable, Service {
                 LOG.error("could not process {} packet", this, e);
             }
         }
+    }
+
+    private static MacAddress fetchIfaceHardwareAddress(Interface iface) throws Exception {
+        NetworkInterface ifaceDevice = NetworkInterface.getByName(iface.getName());
+        if (ifaceDevice == null)
+            throw new Exception(
+                "iface " + iface.getName() + " is not useable (may not exist)");
+        return MacAddress.getByAddress(
+            ifaceDevice.getHardwareAddress());
     }
 
     @Override
