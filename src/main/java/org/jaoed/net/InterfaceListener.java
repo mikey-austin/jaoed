@@ -111,17 +111,15 @@ public class InterfaceListener implements Runnable, Service {
                 {
                     // Special case where target runs on the same machine as the client.
                     continue;
+                } else {
+                    LOG.trace("received {} frame at {}: {}", handle, handle.getTimestamp(), ctx);
                 }
 
-                LOG.trace("received {} frame at {}: {}",
-                    handle, handle.getTimestamp(), ctx);
-
-                List<PacketProcessor> processors = processorRegistry
+                processorRegistry
                     .lookup(ctx)
-                    .orElseThrow(
-                        () -> new Exception("no processor for " + ctx.toString()));
-                processors.forEach(
-                    p -> p.enqueue(ctx));
+                    .ifPresent(
+                        matched -> matched.forEach(
+                            processor -> processor.enqueue(ctx)));
             } catch (TimeoutException e) {
                 // Nothing received, carry on.
             } catch (EOFException e) {
