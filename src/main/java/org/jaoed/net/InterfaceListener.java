@@ -134,12 +134,23 @@ public class InterfaceListener implements Runnable, Service {
     }
 
     private static MacAddress fetchIfaceHardwareAddress(Interface iface) throws Exception {
+        if (iface.getHwAddr() != null) {
+            LOG.info("over-riding iface {} hardware address to {}",
+                     iface.getName(), iface.getHwAddr());
+            return MacAddress.getByName(
+                iface.getHwAddr());
+        }
+
         NetworkInterface ifaceDevice = NetworkInterface.getByName(iface.getName());
         if (ifaceDevice == null)
             throw new Exception(
                 "iface " + iface.getName() + " is not useable (may not exist)");
-        return MacAddress.getByAddress(
-            ifaceDevice.getHardwareAddress());
+
+        byte[] hwAddr = ifaceDevice.getHardwareAddress();
+        if (hwAddr == null)
+            throw new Exception("iface " + iface.getName() + " has no hardware address");
+
+        return MacAddress.getByAddress(hwAddr);
     }
 
     @Override

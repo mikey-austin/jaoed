@@ -135,7 +135,7 @@ public class DeviceTarget implements PacketProcessor, Runnable, Service {
             this.commandFactory = null;
             this.configArea = null;
             this.sectorCount = 0;
-            this.firmwareVersion = 1;
+            this.firmwareVersion = 0;
         }
 
         public Builder setResponseProcessor(ResponseProcessor responseProcessor) {

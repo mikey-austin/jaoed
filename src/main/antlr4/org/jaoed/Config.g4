@@ -49,6 +49,10 @@ bool
     | 'false'
     ;
 
+hwAddr
+    : BYTE':'BYTE':'BYTE':'BYTE':'BYTE':'BYTE # hwAddrString
+    ;
+
 //
 // Logger section syntax.
 //
@@ -71,9 +75,9 @@ interfaceStatements
     ;
 
 interfaceAssignment
-    : 'mtu' '=' ('auto' | INTEGER) # interfaceMtu
-    | 'logger' '=' SYMBOL          # interfaceLogger
-    | 'log-level' '=' logLevel     # interfaceLogLevel
+    : 'hwaddr' '=' hwAddr      # interfaceHwAddr
+    | 'logger' '=' SYMBOL      # interfaceLogger
+    | 'log-level' '=' logLevel # interfaceLogLevel
     ;
 
 //
@@ -143,6 +147,10 @@ COMMENT
 
 STRING
     : '"' ~('\r' | '\n' | '"')* '"'
+    ;
+
+BYTE
+    : [a-fA-F0-9][a-fA-F0-9]
     ;
 
 EOL

@@ -19,7 +19,7 @@ Config:
  -> log-level = TRACE
 }
 {eth0=Interface<eth0>:
- -> mtu = auto
+ -> hwaddr = de:ad:be:ef:00:33
  -> logger = main
  -> log-level = DEBUG
 }

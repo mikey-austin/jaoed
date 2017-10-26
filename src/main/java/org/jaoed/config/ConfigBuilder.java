@@ -139,8 +139,8 @@ public class ConfigBuilder extends ConfigBaseListener {
 
         ConfigParser.InterfaceStatementsContext statements = ctx.interfaceStatements();
         for (ConfigParser.InterfaceAssignmentContext assignment : statements.interfaceAssignment()) {
-            if (assignment instanceof ConfigParser.InterfaceMtuContext) {
-                iface.setMtu(assignment.getChild(2).getText());
+            if (assignment instanceof ConfigParser.InterfaceHwAddrContext) {
+                iface.setHwAddr(assignment.getChild(2).getText());
             } else if (assignment instanceof ConfigParser.InterfaceLoggerContext) {
                 Logger logger = loggerTab.get(assignment.getChild(2).getText());
                 if (logger != null)

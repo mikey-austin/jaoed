@@ -2,7 +2,7 @@ package org.jaoed.config;
 
 public class Interface implements Section {
     private String name;
-    private Mtu mtu;
+    private String hwAddr;
     private Logger logger;
     private Logger.Level logLevel;
 
@@ -23,16 +23,12 @@ public class Interface implements Section {
         this.name = name;
     }
 
-    public Mtu getMtu() {
-        return mtu;
+    public String getHwAddr() {
+        return hwAddr;
     }
 
-    public void setMtu(Mtu mtu) {
-        this.mtu = mtu;
-    }
-
-    public void setMtu(String mtu) {
-        this.mtu = new Mtu(mtu);
+    public void setHwAddr(String hwAddr) {
+        this.hwAddr = hwAddr;
     }
 
     public Logger getLogger() {
@@ -53,52 +49,14 @@ public class Interface implements Section {
 
     @Override
     public String toString() {
-        String out = "Interface<" + name + ">:\n"
-            + " -> mtu = " + mtu + "\n";
+        String out = "Interface<" + name + ">:\n";
+        if (hwAddr != null) {
+            out += " -> hwaddr = " + hwAddr + "\n";
+        }
         if (logger != null) {
             out += " -> logger = " + logger.getName() + "\n"
                 + " -> log-level = " + logLevel + "\n";
         }
-
         return out;
-    }
-
-    public class Mtu {
-        private int mtu;
-        private boolean auto;
-
-        public Mtu() {
-            this.mtu = 0;
-            this.auto = true;
-        }
-
-        public Mtu(String mtu) {
-            if (mtu.equals("auto")) {
-                this.mtu = 0;
-                this.auto = true;
-            } else {
-                this.mtu = new Integer(mtu);
-                this.auto = false;
-            }
-        }
-
-        public Mtu(int mtu) {
-            this.mtu = mtu;
-            this.auto = false;
-        }
-
-        public boolean isAuto() {
-            return this.auto;
-        }
-
-        public int getMtu() {
-            return this.mtu;
-        }
-
-        @Override
-        public String toString() {
-            String out = this.auto ? "auto" : Integer.toString(mtu);
-            return out;
-        }
     }
 }
