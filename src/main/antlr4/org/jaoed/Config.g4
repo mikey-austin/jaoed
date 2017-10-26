@@ -49,10 +49,6 @@ bool
     | 'false'
     ;
 
-hwAddr
-    : BYTE':'BYTE':'BYTE':'BYTE':'BYTE':'BYTE # hwAddrString
-    ;
-
 //
 // Logger section syntax.
 //
@@ -75,7 +71,7 @@ interfaceStatements
     ;
 
 interfaceAssignment
-    : 'hwaddr' '=' hwAddr      # interfaceHwAddr
+    : 'hwaddr' '=' HWADDR      # interfaceHwAddr
     | 'logger' '=' SYMBOL      # interfaceLogger
     | 'log-level' '=' logLevel # interfaceLogLevel
     ;
@@ -133,6 +129,10 @@ aclAssignment
 // Token definitions.
 //
 
+HWADDR
+    : ([0-9a-fA-F][0-9a-fA-F]':')*[0-9a-fA-F][0-9a-fA-F]
+    ;
+
 INTEGER
     : '-'?[0-9]+
     ;
@@ -147,10 +147,6 @@ COMMENT
 
 STRING
     : '"' ~('\r' | '\n' | '"')* '"'
-    ;
-
-BYTE
-    : [a-fA-F0-9][a-fA-F0-9]
     ;
 
 EOL

@@ -228,11 +228,13 @@ public class ConfigBuilder extends ConfigBaseListener {
         ConfigParser.ListContext listCtx = (ConfigParser.ListContext) ctx;
         List<String> strings = new LinkedList<String>();
 
-        for (ConfigParser.ListEntryContext entry : listCtx.listStatements().listEntry()) {
-            if (entry instanceof ConfigParser.StrEntryContext) {
-                strings.add(
-                    unquote(((ConfigParser.StrEntryContext) entry)
-                            .STRING().getText()));
+        if (listCtx.listStatements() != null) {
+            for (ConfigParser.ListEntryContext entry : listCtx.listStatements().listEntry()) {
+                if (entry instanceof ConfigParser.StrEntryContext) {
+                    strings.add(
+                        unquote(((ConfigParser.StrEntryContext) entry)
+                                .STRING().getText()));
+                }
             }
         }
 
