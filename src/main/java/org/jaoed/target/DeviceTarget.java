@@ -61,8 +61,7 @@ public class DeviceTarget implements PacketProcessor, Runnable, Service {
             try {
                 TargetCommand command = inputQueue.poll(pollInterval, TimeUnit.MILLISECONDS);
                 if (command != null) {
-                    responseProcessor.enqueue(
-                        command.execute(this));
+                    command.execute(this).ifPresent(responseProcessor::enqueue);
                 }
             } catch (Exception e) {
                 LOG.error("error executing command in {} target", deviceConfig.getTarget());

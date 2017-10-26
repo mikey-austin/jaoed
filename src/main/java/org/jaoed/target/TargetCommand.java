@@ -1,5 +1,7 @@
 package org.jaoed.target;
 
+import java.util.Optional;
+
 public interface TargetCommand {
-    public TargetResponse execute(DeviceTarget target);
+    public Optional<TargetResponse> execute(DeviceTarget target);
 }

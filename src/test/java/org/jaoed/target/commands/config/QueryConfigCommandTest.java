@@ -22,7 +22,6 @@ import org.jaoed.target.CommandFactory;
 import org.jaoed.target.DeviceConfigArea;
 import org.jaoed.target.DeviceTarget;
 import org.jaoed.target.TargetCommand;
-import org.jaoed.target.TargetResponse;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QueryConfigCommandTest {
@@ -86,7 +85,7 @@ public class QueryConfigCommandTest {
         QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
         TargetCommand cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
-        assertEquals(queryConfigResponse, cmd.execute(target));
+        assertEquals(queryConfigResponse, cmd.execute(target).orElse(null));
         verify(queryConfigResponse, times(1)).setPayload(configStr);
 
         // Test mismatch.
@@ -99,7 +98,7 @@ public class QueryConfigCommandTest {
         when(a1.getPayload()).thenReturn(query);
         cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
-        assertNull(cmd.execute(target));
+        assertFalse(cmd.execute(target).isPresent());
         verify(queryConfigResponse, times(1)).setPayload(configStr);
     }
 
@@ -126,7 +125,7 @@ public class QueryConfigCommandTest {
         QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
         TargetCommand cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
-        assertEquals(queryConfigResponse, cmd.execute(target));
+        assertEquals(queryConfigResponse, cmd.execute(target).orElse(null));
         verify(queryConfigResponse, times(1)).setPayload(configStr);
     }
 
@@ -153,7 +152,7 @@ public class QueryConfigCommandTest {
         QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
         TargetCommand cmd = queryConfigCommand.makeCommand(ctx1).orElse(null);
         assertNotNull(cmd);
-        assertNull(cmd.execute(target));
+        assertFalse(cmd.execute(target).isPresent());
     }
 
     @Test
@@ -170,6 +169,7 @@ public class QueryConfigCommandTest {
         when(target.getConfigArea()).thenReturn(emptyArea);
         when(a1.getPayload()).thenReturn(query);
         when(ctx1.getAoeFrame()).thenReturn(a1);
+        when(queryConfigResponse.setPayload(any())).thenReturn(queryConfigResponse);
         when(queryConfigResponseFactory.apply(ctx1, target)).thenReturn(queryConfigResponse);
 
         QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
@@ -219,6 +219,7 @@ public class QueryConfigCommandTest {
         when(target.getConfigArea()).thenReturn(emptyArea);
         when(a1.getPayload()).thenReturn(query);
         when(ctx1.getAoeFrame()).thenReturn(a1);
+        when(queryConfigResponse.setPayload(any())).thenReturn(queryConfigResponse);
         when(queryConfigResponseFactory.apply(ctx1, target)).thenReturn(queryConfigResponse);
 
         QueryConfigCommand queryConfigCommand = new QueryConfigCommand(queryConfigResponseFactory);
