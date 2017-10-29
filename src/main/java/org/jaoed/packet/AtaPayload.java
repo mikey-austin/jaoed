@@ -202,6 +202,29 @@ public final class AtaPayload extends AbstractPacket {
             this.lba = Arrays.copyOf(builder.lba, builder.lba.length);
         }
 
+        public boolean isAsync() {
+            return this.isAsync;
+        }
+
+        public boolean isWrite() {
+            return this.isWrite;
+        }
+
+        public int getErrFeature() {
+            return this.errFeature;
+        }
+
+        public int getSectorCount() {
+            return this.sectorCount;
+        }
+
+        public int getCmdStatus() {
+            return this.cmdStatus;
+        }
+
+        public int[] getLba() {
+            return this.lba;
+        }
 
         @Override
         protected List<byte[]> getRawFields() {
