@@ -10,6 +10,7 @@ import org.pcap4j.packet.EthernetPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jaoed.config.Device;
 import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.AtaPayload;
@@ -103,9 +104,13 @@ public class AtaCommand implements CommandFactory {
     public TargetCommand identify(RequestContext ctx, AtaPayload query) {
         return target -> {
             LOG.debug("ATA identify requested for device {}", target);
-            AtaResponse response = ataResponseFactory.apply(ctx, target);
 
-            // TODO: identify and populate response.
+            Device deviceConfig = target.getDevice();
+            HdDriveId driveIdentity = new HdDriveId(
+                deviceConfig.getTarget(), deviceConfig.getSizeInBytes());
+            AtaResponse response = ataResponseFactory
+                .apply(ctx, target)
+                .setPayload(driveIdentity.toByteArray());
 
             return Optional.of(response);
         };
