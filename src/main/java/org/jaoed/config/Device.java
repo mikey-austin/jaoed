@@ -105,6 +105,11 @@ public class Device implements Section {
         visitor.visitDevice(this);
     }
 
+    public long getSizeInBytes() {
+        // TODO: actually do something.
+        return 0;
+    }
+
     @Override
     public String toString() {
         String out = "Device<" + target + ">:\n"
