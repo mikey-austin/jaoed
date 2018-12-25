@@ -1,7 +1,5 @@
 package org.jaoed.config;
 
-import java.util.List;
-
 public class Device implements Section {
     private int shelf;
     private int slot;
@@ -112,16 +110,28 @@ public class Device implements Section {
 
     @Override
     public String toString() {
-        String out = "Device<" + target + ">:\n"
-            + " -> shelf = " + Integer.toString(shelf) + "\n"
-            + " -> slot = " + Integer.toString(slot) + "\n"
-            + " -> write-cache = " + Boolean.toString(writeCache) + "\n"
-            + " -> broadcast = " + Boolean.toString(broadcast) + "\n"
-            + " -> iface = " + iface.getName() + "\n";
+        String out =
+                "Device<"
+                        + target
+                        + ">:\n"
+                        + " -> shelf = "
+                        + Integer.toString(shelf)
+                        + "\n"
+                        + " -> slot = "
+                        + Integer.toString(slot)
+                        + "\n"
+                        + " -> write-cache = "
+                        + Boolean.toString(writeCache)
+                        + "\n"
+                        + " -> broadcast = "
+                        + Boolean.toString(broadcast)
+                        + "\n"
+                        + " -> iface = "
+                        + iface.getName()
+                        + "\n";
 
         if (logger != null) {
-            out += " -> logger = " + logger.getName() + "\n"
-                + " -> log-level = " + logLevel + "\n";
+            out += " -> logger = " + logger.getName() + "\n" + " -> log-level = " + logLevel + "\n";
         }
 
         if (acls != null) {
@@ -180,14 +190,10 @@ public class Device implements Section {
             String out = "";
             if (cfgRead != null || cfgSet != null || read != null || write != null) {
                 out += "Acls [ ";
-                if (cfgRead != null)
-                    out += "<cfgRead: " + cfgRead.getName() + "> ";
-                if (cfgSet != null)
-                    out += "<cfgSet: " + cfgSet.getName() + "> ";
-                if (read != null)
-                    out += "<read: " + read.getName() + "> ";
-                if (write != null)
-                    out += "<write: " + write.getName() + "> ";
+                if (cfgRead != null) out += "<cfgRead: " + cfgRead.getName() + "> ";
+                if (cfgSet != null) out += "<cfgSet: " + cfgSet.getName() + "> ";
+                if (read != null) out += "<read: " + read.getName() + "> ";
+                if (write != null) out += "<write: " + write.getName() + "> ";
                 out += "]";
             }
             return out;

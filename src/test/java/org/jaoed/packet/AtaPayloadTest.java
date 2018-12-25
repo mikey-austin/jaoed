@@ -1,38 +1,26 @@
 package org.jaoed.packet;
 
-import java.io.EOFException;
-import java.util.concurrent.TimeoutException;
-
 import static org.junit.Assert.*;
-import org.junit.Test;
-
-import org.pcap4j.util.ByteArrays;
-import org.pcap4j.core.NotOpenException;
-import org.pcap4j.core.PcapHandle;
-import org.pcap4j.core.PcapHandle.TimestampPrecision;
-import org.pcap4j.core.PcapNativeException;
-import org.pcap4j.core.Pcaps;
-import org.pcap4j.packet.Packet;
-import org.pcap4j.packet.EthernetPacket;
-import org.pcap4j.packet.IllegalRawDataException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.jaoed.packet.namednumber.*;
+import org.junit.Test;
+import org.pcap4j.packet.IllegalRawDataException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AtaPayloadTest {
     private static final Logger LOG = LoggerFactory.getLogger(AtaPayloadTest.class);
 
     @Test
     public void testBuilder() throws IllegalRawDataException {
-        AtaPayload.Builder builder = new AtaPayload.Builder()
-            .isAsync(true)
-            .isWrite(true)
-            .errFeature(210)
-            .sectorCount(145)
-            .cmdStatus(204)
-            .lba(new int[] { 232, 2, 3, 4, 5, 6 });
+        AtaPayload.Builder builder =
+                new AtaPayload.Builder()
+                        .isAsync(true)
+                        .isWrite(true)
+                        .errFeature(210)
+                        .sectorCount(145)
+                        .cmdStatus(204)
+                        .lba(new int[] {232, 2, 3, 4, 5, 6});
 
         AtaPayload queryConfig = builder.build();
         assertNotNull(queryConfig);

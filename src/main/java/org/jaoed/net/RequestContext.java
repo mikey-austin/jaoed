@@ -1,12 +1,10 @@
 package org.jaoed.net;
 
 import java.util.function.Consumer;
-
+import org.jaoed.packet.AoeFrame;
 import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.util.MacAddress;
-
-import org.jaoed.packet.AoeFrame;
 
 public class RequestContext {
     private final EthernetPacket requestFrame;
@@ -14,7 +12,9 @@ public class RequestContext {
     private final Consumer<Packet> sender;
     private final MacAddress ifaceAddr;
 
-    public RequestContext(EthernetPacket requestFrame, Consumer<Packet> sender, MacAddress ifaceAddr) throws Exception {
+    public RequestContext(
+            EthernetPacket requestFrame, Consumer<Packet> sender, MacAddress ifaceAddr)
+            throws Exception {
         this.requestFrame = requestFrame;
         this.aoeFrame = AoeFrame.newPacket(requestFrame.getPayload());
         this.sender = sender;
@@ -39,8 +39,6 @@ public class RequestContext {
 
     @Override
     public String toString() {
-        return requestFrame.getHeader().toString()
-            + " "
-            + aoeFrame.getHeader().toString();
+        return requestFrame.getHeader().toString() + " " + aoeFrame.getHeader().toString();
     }
 }

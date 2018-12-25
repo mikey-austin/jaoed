@@ -17,8 +17,7 @@ public class File extends Logger {
 
     @Override
     public String toString() {
-        String out = "Logger<File>[" + super.getName() + "]:\n"
-            + " -> file = " + fileName + "\n";
+        String out = "Logger<File>[" + super.getName() + "]:\n" + " -> file = " + fileName + "\n";
         return out;
     }
 }

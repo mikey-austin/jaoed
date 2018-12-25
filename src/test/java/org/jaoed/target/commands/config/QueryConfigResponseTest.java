@@ -1,32 +1,26 @@
 package org.jaoed.target.commands.config;
 
-import java.util.Arrays;
-import java.util.function.BiFunction;
-
-import org.mockito.*;
-import org.mockito.runners.*;
-import static org.mockito.Mockito.*;
-
-import static org.junit.Assert.*;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.pcap4j.packet.EthernetPacket;
-import org.pcap4j.packet.UnknownPacket;
-import org.pcap4j.packet.namednumber.EtherType;
-import org.pcap4j.util.MacAddress;
+import static org.jaoed.target.TargetUtils.encodeMajor;
+import static org.jaoed.target.TargetUtils.encodeMinor;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import org.jaoed.config.Device;
 import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.QueryConfigPayload;
-import org.jaoed.packet.namednumber.AoeError;
 import org.jaoed.packet.namednumber.QueryConfigSubCommand;
-import org.jaoed.target.CommandFactory;
 import org.jaoed.target.DeviceTarget;
-import org.jaoed.target.TargetCommand;
-import org.jaoed.target.TargetResponse;
-import static org.jaoed.target.TargetUtils.*;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.pcap4j.packet.EthernetPacket;
+import org.pcap4j.packet.namednumber.EtherType;
+import org.pcap4j.util.MacAddress;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QueryConfigResponseTest {
@@ -35,32 +29,30 @@ public class QueryConfigResponseTest {
 
     @Test
     public void testQueryConfigResponse() throws Exception {
-        QueryConfigPayload.Builder query = new QueryConfigPayload.Builder()
-            .subCommand(QueryConfigSubCommand.READ_CONFIG); ;
-        AoeFrame aoeFrame = new AoeFrame.Builder()
-            .version((byte) 1)
-            .responseFlag(false)
-            .responseErrorFlag(false)
-            .majorNumber((short) 222)
-            .minorNumber((byte) 33)
-            .command((byte) 1)
-            .tag(new byte[] { 0x11, 0x22, 0x33, 0x44 })
-            .payloadBuilder(query)
-            .build();
-        EthernetPacket ethFrame = new EthernetPacket.Builder()
-            .paddingAtBuild(true)
-            .type(
-                new EtherType((short) 0x88A2, "AOE"))
-            .srcAddr(
-                MacAddress.getByName("de:ad:be:ef:00:01"))
-            .dstAddr(
-                MacAddress.getByName("de:ad:be:ef:00:02"))
-            .build();
+        QueryConfigPayload.Builder query =
+                new QueryConfigPayload.Builder().subCommand(QueryConfigSubCommand.READ_CONFIG);
+
+        AoeFrame aoeFrame =
+                new AoeFrame.Builder()
+                        .version((byte) 1)
+                        .responseFlag(false)
+                        .responseErrorFlag(false)
+                        .majorNumber((short) 222)
+                        .minorNumber((byte) 33)
+                        .command((byte) 1)
+                        .tag(new byte[] {0x11, 0x22, 0x33, 0x44})
+                        .payloadBuilder(query)
+                        .build();
+        EthernetPacket ethFrame =
+                new EthernetPacket.Builder()
+                        .paddingAtBuild(true)
+                        .type(new EtherType((short) 0x88A2, "AOE"))
+                        .srcAddr(MacAddress.getByName("de:ad:be:ef:00:01"))
+                        .dstAddr(MacAddress.getByName("de:ad:be:ef:00:02"))
+                        .build();
 
         int shelf = 123, slot = 37;
-        Device device = new Device()
-            .setShelf(shelf)
-            .setSlot(slot);
+        Device device = new Device().setShelf(shelf).setSlot(slot);
 
         when(target.getFirmwareVersion()).thenReturn((short) 1);
         when(target.getSectorCount()).thenReturn((byte) 2);
@@ -70,7 +62,7 @@ public class QueryConfigResponseTest {
         when(ctx.getIfaceAddr()).thenReturn(MacAddress.getByName("de:ad:be:ef:33:11"));
         when(ctx.getEthernetFrame()).thenReturn(ethFrame);
 
-        byte[] payload = new byte[] { 'a', 'b', 'c' };
+        byte[] payload = new byte[] {'a', 'b', 'c'};
         QueryConfigResponse queryConfigResponse = new QueryConfigResponse(ctx, target);
         queryConfigResponse.setPayload(payload);
 

@@ -1,16 +1,13 @@
 package org.jaoed.target;
 
-import java.lang.Thread;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
+import org.jaoed.service.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.jaoed.service.Service;
 
 public class PooledSender implements ResponseProcessor, Service, Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(PooledSender.class);
@@ -67,8 +64,7 @@ public class PooledSender implements ResponseProcessor, Service, Runnable {
         this.running = false;
         threadPool.shutdown();
         try {
-            if (!threadPool.awaitTermination(60, TimeUnit.SECONDS))
-                threadPool.shutdownNow();
+            if (!threadPool.awaitTermination(60, TimeUnit.SECONDS)) threadPool.shutdownNow();
             senderThread.join();
         } catch (Exception e) {
             LOG.error("error stopping pooled sender thread", e);

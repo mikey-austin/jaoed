@@ -1,14 +1,13 @@
 package org.jaoed.target;
 
-import java.util.Arrays;
-
-import org.mockito.*;
-import org.mockito.runners.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import static org.junit.Assert.*;
+import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.*;
+import org.mockito.runners.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigAreaTest {
@@ -19,7 +18,7 @@ public class ConfigAreaTest {
         assertTrue(area.isPrefixMatch(new byte[] {}, 0));
         assertTrue(area.isEmpty());
 
-        byte[] bytes = new byte[] { 'h', 'e', 'l', 'l', 'o' };
+        byte[] bytes = new byte[] {'h', 'e', 'l', 'l', 'o'};
         assertFalse(area.isCompleteMatch(bytes, bytes.length));
         assertFalse(area.isPrefixMatch(bytes, bytes.length));
 
@@ -28,11 +27,11 @@ public class ConfigAreaTest {
         assertFalse(area.isEmpty());
         assertTrue(area.isCompleteMatch(bytes2, bytes2.length));
 
-        byte[] bytes3 = new byte[] { 'h', 'e' };
+        byte[] bytes3 = new byte[] {'h', 'e'};
         assertFalse(area.isCompleteMatch(bytes3, bytes3.length));
         assertTrue(area.isPrefixMatch(bytes3, bytes3.length));
         assertTrue(area.isPrefixMatch(bytes2, bytes2.length));
-        assertFalse(area.isPrefixMatch(new byte[] { 'z', 'z' }, 100));
+        assertFalse(area.isPrefixMatch(new byte[] {'z', 'z'}, 100));
 
         // Test truncation.
         byte[] tooLong = new byte[ConfigArea.MAX_LENGTH + 100];

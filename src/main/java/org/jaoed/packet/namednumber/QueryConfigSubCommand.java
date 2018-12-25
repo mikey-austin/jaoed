@@ -3,28 +3,27 @@ package org.jaoed.packet.namednumber;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import org.pcap4j.packet.namednumber.NamedNumber;
 
 public final class QueryConfigSubCommand extends NamedNumber<Byte, QueryConfigSubCommand> {
 
-    private static final Map<Byte, QueryConfigSubCommand> registry
-        = new HashMap<Byte, QueryConfigSubCommand>();
+    private static final Map<Byte, QueryConfigSubCommand> registry =
+            new HashMap<Byte, QueryConfigSubCommand>();
 
-    public static final QueryConfigSubCommand READ_CONFIG
-        = new QueryConfigSubCommand((byte) 0, "Read target config string");
+    public static final QueryConfigSubCommand READ_CONFIG =
+            new QueryConfigSubCommand((byte) 0, "Read target config string");
 
-    public static final QueryConfigSubCommand TEST_FULL_MATCH
-        = new QueryConfigSubCommand((byte) 1, "Test complete config string match");
+    public static final QueryConfigSubCommand TEST_FULL_MATCH =
+            new QueryConfigSubCommand((byte) 1, "Test complete config string match");
 
-    public static final QueryConfigSubCommand TEST_PREFIX_MATCH
-        = new QueryConfigSubCommand((byte) 2, "Test prefix config string match");
+    public static final QueryConfigSubCommand TEST_PREFIX_MATCH =
+            new QueryConfigSubCommand((byte) 2, "Test prefix config string match");
 
-    public static final QueryConfigSubCommand SET_IF_EMPTY
-        = new QueryConfigSubCommand((byte) 3, "Set config string if not already set");
+    public static final QueryConfigSubCommand SET_IF_EMPTY =
+            new QueryConfigSubCommand((byte) 3, "Set config string if not already set");
 
-    public static final QueryConfigSubCommand SET_FORCE
-        = new QueryConfigSubCommand((byte) 4, "Unconditionally set target config string");
+    public static final QueryConfigSubCommand SET_FORCE =
+            new QueryConfigSubCommand((byte) 4, "Unconditionally set target config string");
 
     static {
         registry.put(READ_CONFIG.value(), READ_CONFIG);

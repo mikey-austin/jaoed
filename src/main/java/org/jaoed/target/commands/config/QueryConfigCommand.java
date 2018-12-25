@@ -4,14 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
-
-import org.pcap4j.packet.EthernetPacket;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.jaoed.net.RequestContext;
-import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.QueryConfigPayload;
 import org.jaoed.packet.namednumber.AoeError;
 import org.jaoed.packet.namednumber.QueryConfigSubCommand;
@@ -20,18 +13,26 @@ import org.jaoed.target.ConfigArea;
 import org.jaoed.target.DeviceTarget;
 import org.jaoed.target.TargetCommand;
 import org.jaoed.target.TargetResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryConfigCommand implements CommandFactory {
     private static final Logger LOG = LoggerFactory.getLogger(QueryConfigCommand.class);
 
-    private final Map<QueryConfigSubCommand, BiFunction<RequestContext, QueryConfigPayload, TargetCommand>> dispatch;
-    private final BiFunction<RequestContext, DeviceTarget, QueryConfigResponse> queryConfigResponseFactory;
+    private final Map<
+                    QueryConfigSubCommand,
+                    BiFunction<RequestContext, QueryConfigPayload, TargetCommand>>
+            dispatch;
+    private final BiFunction<RequestContext, DeviceTarget, QueryConfigResponse>
+            queryConfigResponseFactory;
 
     public QueryConfigCommand() {
         this(QueryConfigResponse::new);
     }
 
-    public QueryConfigCommand(BiFunction<RequestContext, DeviceTarget, QueryConfigResponse> queryConfigResponseFactory) {
+    public QueryConfigCommand(
+            BiFunction<RequestContext, DeviceTarget, QueryConfigResponse>
+                    queryConfigResponseFactory) {
         this.queryConfigResponseFactory = queryConfigResponseFactory;
         this.dispatch = new HashMap<>();
         this.dispatch.put(QueryConfigSubCommand.READ_CONFIG, this::readConfig);
@@ -44,18 +45,14 @@ public class QueryConfigCommand implements CommandFactory {
     @Override
     public Optional<TargetCommand> makeCommand(RequestContext ctx) {
         try {
-            QueryConfigPayload query = QueryConfigPayload.newPacket(
-                ctx.getAoeFrame().getPayload());
-            return Optional
-                .ofNullable(
-                    dispatch.get(query.getHeader().getSubCommand()))
-                .map(subCmd -> subCmd.apply(ctx, query));
+            QueryConfigPayload query = QueryConfigPayload.newPacket(ctx.getAoeFrame().getPayload());
+            return Optional.ofNullable(dispatch.get(query.getHeader().getSubCommand()))
+                    .map(subCmd -> subCmd.apply(ctx, query));
         } catch (Exception e) {
             LOG.error("could not make query config command", e);
         }
 
-        return Optional.of(
-            target -> error(target, ctx, AoeError.CMD_UNKNOWN));
+        return Optional.of(target -> error(target, ctx, AoeError.CMD_UNKNOWN));
     }
 
     public TargetCommand readConfig(RequestContext ctx, QueryConfigPayload query) {
@@ -74,7 +71,8 @@ public class QueryConfigCommand implements CommandFactory {
         return target -> {
             ConfigArea configArea = target.getConfigArea();
             byte[] queryString = query.getPayload().getRawData();
-            if (configArea.isCompleteMatch(queryString, query.getHeader().getConfigStringLength())) {
+            if (configArea.isCompleteMatch(
+                    queryString, query.getHeader().getConfigStringLength())) {
                 LOG.debug("full config string match for device {}", target);
                 QueryConfigResponse response = queryConfigResponseFactory.apply(ctx, target);
                 if (!configArea.isEmpty()) {
@@ -112,11 +110,14 @@ public class QueryConfigCommand implements CommandFactory {
             if (configArea.isEmpty()) {
                 byte[] toSet = query.getPayload().getRawData();
                 configArea.setConfig(toSet, query.getHeader().getConfigStringLength());
-                LOG.debug("setting config string of {} bytes for device {}",
-                          query.getHeader().getConfigStringLength(), target);
-                return Optional
-                    .of(queryConfigResponseFactory.apply(ctx, target)
-                        .setPayload(configArea.getConfig()));
+                LOG.debug(
+                        "setting config string of {} bytes for device {}",
+                        query.getHeader().getConfigStringLength(),
+                        target);
+                return Optional.of(
+                        queryConfigResponseFactory
+                                .apply(ctx, target)
+                                .setPayload(configArea.getConfig()));
             }
 
             LOG.debug("refusing to overwrite config string for device {}", target);
@@ -129,19 +130,22 @@ public class QueryConfigCommand implements CommandFactory {
             ConfigArea configArea = target.getConfigArea();
             byte[] toSet = query.getPayload().getRawData();
             configArea.setConfig(toSet, query.getHeader().getConfigStringLength());
-            LOG.debug("force setting config string of {} bytes for device {}",
-                      query.getHeader().getConfigStringLength(), target);
-            return Optional
-                .of(queryConfigResponseFactory.apply(ctx, target)
-                    .setPayload(configArea.getConfig()));
+            LOG.debug(
+                    "force setting config string of {} bytes for device {}",
+                    query.getHeader().getConfigStringLength(),
+                    target);
+            return Optional.of(
+                    queryConfigResponseFactory
+                            .apply(ctx, target)
+                            .setPayload(configArea.getConfig()));
         };
     }
 
-    private Optional<TargetResponse> error(DeviceTarget target, RequestContext ctx, AoeError errorCode) {
+    private Optional<TargetResponse> error(
+            DeviceTarget target, RequestContext ctx, AoeError errorCode) {
         ConfigArea configArea = target.getConfigArea();
-        QueryConfigResponse response = queryConfigResponseFactory
-            .apply(ctx, target)
-            .setError(errorCode);
+        QueryConfigResponse response =
+                queryConfigResponseFactory.apply(ctx, target).setError(errorCode);
         if (!configArea.isEmpty()) {
             response.setPayload(configArea.getConfig());
         }

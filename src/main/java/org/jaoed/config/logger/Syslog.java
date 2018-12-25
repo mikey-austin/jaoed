@@ -26,9 +26,16 @@ public class Syslog extends Logger {
 
     @Override
     public String toString() {
-        String out = "Logger<Syslog>[" + super.getName() + "]:\n"
-            + " -> level = " + level + "\n"
-            + " -> facility = " + facility + "\n";
+        String out =
+                "Logger<Syslog>["
+                        + super.getName()
+                        + "]:\n"
+                        + " -> level = "
+                        + level
+                        + "\n"
+                        + " -> facility = "
+                        + facility
+                        + "\n";
         return out;
     }
 }

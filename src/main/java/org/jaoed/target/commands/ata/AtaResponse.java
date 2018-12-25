@@ -1,23 +1,15 @@
 package org.jaoed.target.commands.ata;
 
-import java.util.Arrays;
-
-import org.pcap4j.packet.EthernetPacket;
-import org.pcap4j.packet.Packet;
-import org.pcap4j.packet.UnknownPacket;
-import org.pcap4j.util.MacAddress;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.AtaPayload;
 import org.jaoed.packet.namednumber.AoeError;
-import org.jaoed.target.ConfigArea;
 import org.jaoed.target.DeviceTarget;
-import org.jaoed.target.TargetCommand;
 import org.jaoed.target.TargetResponse;
+import org.pcap4j.packet.EthernetPacket;
+import org.pcap4j.packet.Packet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AtaResponse implements TargetResponse {
     private static final Logger LOG = LoggerFactory.getLogger(AtaResponse.class);
@@ -54,32 +46,27 @@ public class AtaResponse implements TargetResponse {
 
     public Packet makeResponse() {
         try {
-            AtaPayload request = AtaPayload.newPacket(
-                ctx.getAoeFrame().getPayload());
+            AtaPayload request = AtaPayload.newPacket(ctx.getAoeFrame().getPayload());
             AtaPayload.Builder ata = request.getBuilder();
 
             // TODO: Set various error byte and payload fields in ata builder.
 
-            AoeFrame.Builder aoe = ctx
-                .getAoeFrame()
-                .getBuilder()
-                .responseFlag(true)
-                .majorNumber(target.getDevice().getShelf())
-                .minorNumber(target.getDevice().getSlot())
-                .payloadBuilder(ata);
+            AoeFrame.Builder aoe =
+                    ctx.getAoeFrame()
+                            .getBuilder()
+                            .responseFlag(true)
+                            .majorNumber(target.getDevice().getShelf())
+                            .minorNumber(target.getDevice().getSlot())
+                            .payloadBuilder(ata);
             if (error != null) {
                 aoe.responseErrorFlag(true);
                 aoe.error(error);
             }
 
-            EthernetPacket.Builder eth = ctx
-                .getEthernetFrame()
-                .getBuilder()
-                .payloadBuilder(aoe);
+            EthernetPacket.Builder eth = ctx.getEthernetFrame().getBuilder().payloadBuilder(aoe);
 
             // Reverse ethernet request addresses.
-            eth.dstAddr(
-                ctx.getEthernetFrame().getHeader().getSrcAddr());
+            eth.dstAddr(ctx.getEthernetFrame().getHeader().getSrcAddr());
 
             // Always stamp the incoming interface's hardware address.
             eth.srcAddr(ctx.getIfaceAddr());

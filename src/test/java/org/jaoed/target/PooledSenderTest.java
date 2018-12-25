@@ -1,20 +1,14 @@
 package org.jaoed.target;
 
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.mockito.*;
-import org.mockito.runners.*;
+import static org.jaoed.target.TargetUtils.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.concurrent.ConcurrentHashMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.junit.Assert.*;
-
-import org.jaoed.config.Device;
-import org.jaoed.net.RequestContext;
-import org.jaoed.packet.AoeFrame;
-import org.jaoed.packet.PacketProcessor;
-import static org.jaoed.target.TargetUtils.*;
+import org.mockito.*;
+import org.mockito.runners.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PooledSenderTest {

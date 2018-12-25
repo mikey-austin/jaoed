@@ -1,18 +1,18 @@
 package org.jaoed.target;
 
+import static org.jaoed.target.TargetUtils.*;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.jaoed.config.Device;
 import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.PacketProcessor;
 import org.jaoed.packet.ProcessorRegistry;
-import static org.jaoed.target.TargetUtils.*;
 
 public class TargetRegistry implements ProcessorRegistry {
     private final Map<Long, List<PacketProcessor>> targets = new HashMap<>();
@@ -31,16 +31,15 @@ public class TargetRegistry implements ProcessorRegistry {
             // Broadcast packet; matches all targets.
             return Optional.of(allTargets);
         } else {
-            return Optional.ofNullable(
-                targets.get(combineMajorMinor(major, minor)));
+            return Optional.ofNullable(targets.get(combineMajorMinor(major, minor)));
         }
     }
 
     public TargetRegistry addTarget(DeviceTarget target) {
         Device device = target.getDevice();
         targets.put(
-            combineMajorMinor(device.getShelf(), device.getSlot()),
-            Collections.singletonList(target));
+                combineMajorMinor(device.getShelf(), device.getSlot()),
+                Collections.singletonList(target));
         allTargets.add(target);
         return this;
     }

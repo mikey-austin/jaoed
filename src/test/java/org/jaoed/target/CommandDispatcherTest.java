@@ -1,19 +1,17 @@
 package org.jaoed.target;
 
-import java.util.HashMap;
-import java.util.Optional;
-
-import org.mockito.*;
-import org.mockito.runners.*;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
+import java.util.HashMap;
+import java.util.Optional;
 import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.namednumber.AoeCommand;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.*;
+import org.mockito.runners.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CommandDispatcherTest {
@@ -23,19 +21,21 @@ public class CommandDispatcherTest {
     public void testDispatcher() {
         HashMap<String, String> results = new HashMap<>();
 
-        CommandDispatcher dispatcher = CommandDispatcher
-            .newBuilder()
-            .addCommandFactory(
-                AoeCommand.ISSUE_ATA, ctx -> {
-                    results.put("first", "called");
-                    return Optional.of(dummyCommand);
-                })
-            .addCommandFactory(
-                AoeCommand.QUERY_CONFIG, ctx -> {
-                    results.put("second", "called next");
-                    return Optional.of(dummyCommand);
-                })
-            .build();
+        CommandDispatcher dispatcher =
+                CommandDispatcher.newBuilder()
+                        .addCommandFactory(
+                                AoeCommand.ISSUE_ATA,
+                                ctx -> {
+                                    results.put("first", "called");
+                                    return Optional.of(dummyCommand);
+                                })
+                        .addCommandFactory(
+                                AoeCommand.QUERY_CONFIG,
+                                ctx -> {
+                                    results.put("second", "called next");
+                                    return Optional.of(dummyCommand);
+                                })
+                        .build();
         assertNotNull(dispatcher);
 
         // Test first.
@@ -51,9 +51,7 @@ public class CommandDispatcherTest {
     }
 
     private static RequestContext wrap(AoeCommand cmd) {
-        AoeFrame frame = new AoeFrame.Builder()
-            .command(cmd)
-            .build();
+        AoeFrame frame = new AoeFrame.Builder().command(cmd).build();
         RequestContext ctx = mock(RequestContext.class);
         when(ctx.getAoeFrame()).thenReturn(frame);
         return ctx;

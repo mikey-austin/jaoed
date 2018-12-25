@@ -3,25 +3,21 @@ package org.jaoed.packet.namednumber;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import org.pcap4j.packet.namednumber.NamedNumber;
 
 public final class AoeCommand extends NamedNumber<Byte, AoeCommand> {
 
-    public static final AoeCommand ISSUE_ATA
-        = new AoeCommand((byte) 0, "Issue ata command");
+    public static final AoeCommand ISSUE_ATA = new AoeCommand((byte) 0, "Issue ata command");
 
-    public static final AoeCommand QUERY_CONFIG
-        = new AoeCommand((byte) 1, "Query/config command");
+    public static final AoeCommand QUERY_CONFIG = new AoeCommand((byte) 1, "Query/config command");
 
-    public static final AoeCommand MAC_MASK_LIST
-        = new AoeCommand((byte) 2, "MAC mask list command");
+    public static final AoeCommand MAC_MASK_LIST =
+            new AoeCommand((byte) 2, "MAC mask list command");
 
-    public static final AoeCommand RESERVE_RELEASE
-        = new AoeCommand((byte) 3, "Reserve/release command");
+    public static final AoeCommand RESERVE_RELEASE =
+            new AoeCommand((byte) 3, "Reserve/release command");
 
-    private static final Map<Byte, AoeCommand> registry
-        = new HashMap<Byte, AoeCommand>();
+    private static final Map<Byte, AoeCommand> registry = new HashMap<Byte, AoeCommand>();
 
     static {
         registry.put(ISSUE_ATA.value(), ISSUE_ATA);

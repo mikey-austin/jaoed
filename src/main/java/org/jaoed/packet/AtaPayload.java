@@ -1,19 +1,18 @@
 package org.jaoed.packet;
 
+import static org.pcap4j.util.ByteArrays.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.pcap4j.packet.AbstractPacket;
 import org.pcap4j.packet.IllegalRawDataException;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.UnknownPacket;
 import org.pcap4j.util.ByteArrays;
-import org.pcap4j.util.MacAddress;
-import static org.pcap4j.util.ByteArrays.*;
 
 public final class AtaPayload extends AbstractPacket {
-    private final static int LBA_FIELDS = 6;
+    private static final int LBA_FIELDS = 6;
 
     private final Header header;
     private final Packet payload;
@@ -24,14 +23,13 @@ public final class AtaPayload extends AbstractPacket {
     }
 
     public static AtaPayload newPacket(byte[] rawData, int offset, int length)
-        throws IllegalRawDataException {
+            throws IllegalRawDataException {
 
         ByteArrays.validateBounds(rawData, offset, length);
         return new AtaPayload(rawData, offset, length);
     }
 
-    private AtaPayload(byte[] rawData, int offset, int length)
-        throws IllegalRawDataException {
+    private AtaPayload(byte[] rawData, int offset, int length) throws IllegalRawDataException {
 
         this.header = new Header(rawData, offset, length);
 
@@ -42,9 +40,12 @@ public final class AtaPayload extends AbstractPacket {
         if (payloadLength < 0) {
             throw new IllegalRawDataException("invalid payload length");
         } else if (payloadLength > 0) {
-            this.payload = new UnknownPacket.Builder()
-                .rawData(Arrays.copyOfRange(rawData, payloadOffset, payloadOffset + payloadLength))
-                .build();
+            this.payload =
+                    new UnknownPacket.Builder()
+                            .rawData(
+                                    Arrays.copyOfRange(
+                                            rawData, payloadOffset, payloadOffset + payloadLength))
+                            .build();
         } else {
             this.payload = null;
         }
@@ -52,9 +53,7 @@ public final class AtaPayload extends AbstractPacket {
 
     private AtaPayload(Builder builder) {
         this.header = new Header(builder);
-        this.payload = builder.payloadBuilder != null
-            ? builder.payloadBuilder.build()
-            : null;
+        this.payload = builder.payloadBuilder != null ? builder.payloadBuilder.build() : null;
     }
 
     @Override
@@ -91,8 +90,7 @@ public final class AtaPayload extends AbstractPacket {
             this.sectorCount = header.sectorCount;
             this.cmdStatus = header.cmdStatus;
             this.lba = Arrays.copyOf(header.lba, LBA_FIELDS);
-            if (packet.payload != null)
-                this.payloadBuilder = packet.payload.getBuilder();
+            if (packet.payload != null) this.payloadBuilder = packet.payload.getBuilder();
         }
 
         public Builder isAsync(boolean isAsync) {
@@ -170,13 +168,13 @@ public final class AtaPayload extends AbstractPacket {
             if (length < ATA_SIZE) {
                 StringBuilder sb = new StringBuilder(200);
                 sb.append("The data is too short to build a AtaPayload header (")
-                    .append(ATA_SIZE)
-                    .append(" bytes). data: ")
-                    .append(ByteArrays.toHexString(rawData, " "))
-                    .append(", offset: ")
-                    .append(offset)
-                    .append(", length: ")
-                    .append(length);
+                        .append(ATA_SIZE)
+                        .append(" bytes). data: ")
+                        .append(ByteArrays.toHexString(rawData, " "))
+                        .append(", offset: ")
+                        .append(offset)
+                        .append(", length: ")
+                        .append(length);
                 throw new IllegalRawDataException(sb.toString());
             }
 
@@ -260,46 +258,29 @@ public final class AtaPayload extends AbstractPacket {
             StringBuilder sb = new StringBuilder();
             String ls = System.getProperty("line.separator");
 
-            sb.append("[AoE/AtaPayload (")
-                .append(length())
-                .append(" bytes)]")
-                .append(ls);
-            sb.append("  is async: ")
-                .append(isAsync ? "yes" : "no")
-                .append(ls);
-            sb.append("  is write: ")
-                .append(isWrite ? "yes" : "no")
-                .append(ls);
-            sb.append("  err/feature: ")
-                .append(errFeature)
-                .append(ls);
-            sb.append("  sectors: ")
-                .append(sectorCount)
-                .append(ls);
-            sb.append("  cmd/status: ")
-                .append(cmdStatus)
-                .append(ls);
-            sb.append("  lba: ")
-                .append(Arrays.toString(lba))
-                .append(ls);
+            sb.append("[AoE/AtaPayload (").append(length()).append(" bytes)]").append(ls);
+            sb.append("  is async: ").append(isAsync ? "yes" : "no").append(ls);
+            sb.append("  is write: ").append(isWrite ? "yes" : "no").append(ls);
+            sb.append("  err/feature: ").append(errFeature).append(ls);
+            sb.append("  sectors: ").append(sectorCount).append(ls);
+            sb.append("  cmd/status: ").append(cmdStatus).append(ls);
+            sb.append("  lba: ").append(Arrays.toString(lba)).append(ls);
 
             return sb.toString();
         }
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == this)
-                return true;
-            if (!this.getClass().isInstance(obj))
-                return false;
+            if (obj == this) return true;
+            if (!this.getClass().isInstance(obj)) return false;
 
             Header other = (Header) obj;
             return this.isAsync == other.isAsync
-                && this.isWrite == other.isWrite
-                && this.errFeature == other.errFeature
-                && this.sectorCount == other.sectorCount
-                && this.cmdStatus == other.cmdStatus
-                && Arrays.equals(this.lba, other.lba);
+                    && this.isWrite == other.isWrite
+                    && this.errFeature == other.errFeature
+                    && this.sectorCount == other.sectorCount
+                    && this.cmdStatus == other.cmdStatus
+                    && Arrays.equals(this.lba, other.lba);
         }
 
         @Override
@@ -308,8 +289,7 @@ public final class AtaPayload extends AbstractPacket {
             result = 31 * result + errFeature;
             result = 31 * result + sectorCount;
             result = 31 * result + cmdStatus;
-            for (int i = 0; i < LBA_FIELDS; i++)
-                result = 31 * result + lba[i];
+            for (int i = 0; i < LBA_FIELDS; i++) result = 31 * result + lba[i];
             return result;
         }
     }

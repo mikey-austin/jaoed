@@ -1,30 +1,22 @@
 package org.jaoed.net;
 
 import java.io.EOFException;
-import java.lang.Runnable;
 import java.net.NetworkInterface;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.pcap4j.core.BpfProgram;
-import org.pcap4j.core.PcapHandle;
-import org.pcap4j.packet.Packet;
-import org.pcap4j.packet.EthernetPacket;
-import org.pcap4j.util.MacAddress;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.jaoed.config.Interface;
-import org.jaoed.packet.AoeFrame;
-import org.jaoed.packet.PacketProcessor;
 import org.jaoed.packet.ProcessorRegistry;
 import org.jaoed.service.Service;
+import org.pcap4j.core.BpfProgram;
+import org.pcap4j.core.PcapHandle;
+import org.pcap4j.packet.EthernetPacket;
+import org.pcap4j.packet.Packet;
+import org.pcap4j.util.MacAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InterfaceListener implements Runnable, Service {
     private static final Logger LOG = LoggerFactory.getLogger(InterfaceListener.class);
@@ -38,27 +30,35 @@ public class InterfaceListener implements Runnable, Service {
     private final MacAddress ifaceAddr;
     private volatile boolean running;
 
-    public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry, int ifacePollMs) throws Exception {
-        this(iface,
-             processorRegistry,
-             ifacePollMs,
-             _iface -> {
-                try {
-                    PcapHandle handle = new PcapHandle.Builder(_iface.getName())
-                        .timeoutMillis(ifacePollMs)
-                        .build();
-                    handle.setFilter("ether proto 0x88A2", BpfProgram.BpfCompileMode.OPTIMIZE);
-                    return handle;
-                } catch (Exception e) {
-                    LOG.error("could not create pcap handle", e);
-                    return null;
-                }
-             },
-             fetchIfaceHardwareAddress(iface));
+    public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry, int ifacePollMs)
+            throws Exception {
+        this(
+                iface,
+                processorRegistry,
+                ifacePollMs,
+                _iface -> {
+                    try {
+                        PcapHandle handle =
+                                new PcapHandle.Builder(_iface.getName())
+                                        .timeoutMillis(ifacePollMs)
+                                        .build();
+                        handle.setFilter("ether proto 0x88A2", BpfProgram.BpfCompileMode.OPTIMIZE);
+                        return handle;
+                    } catch (Exception e) {
+                        LOG.error("could not create pcap handle", e);
+                        return null;
+                    }
+                },
+                fetchIfaceHardwareAddress(iface));
     }
 
-    public InterfaceListener(Interface iface, ProcessorRegistry processorRegistry, int ifacePollMs,
-                             Function<Interface, PcapHandle> handleFactory, MacAddress ifaceAddr) throws Exception {
+    public InterfaceListener(
+            Interface iface,
+            ProcessorRegistry processorRegistry,
+            int ifacePollMs,
+            Function<Interface, PcapHandle> handleFactory,
+            MacAddress ifaceAddr)
+            throws Exception {
 
         if ((this.handle = handleFactory.apply(iface)) == null) {
             throw new Exception("could not create pcap handle");
@@ -69,13 +69,14 @@ public class InterfaceListener implements Runnable, Service {
         this.running = false;
         this.processorRegistry = processorRegistry;
         this.listenerThread = new Thread(this);
-        this.sender = packet -> {
-            try {
-                handle.sendPacket(packet);
-            } catch (Exception e) {
-                LOG.error("could not send packet via {} interface", this, e);
-            }
-        };
+        this.sender =
+                packet -> {
+                    try {
+                        handle.sendPacket(packet);
+                    } catch (Exception e) {
+                        LOG.error("could not send packet via {} interface", this, e);
+                    }
+                };
     }
 
     @Override
@@ -100,15 +101,14 @@ public class InterfaceListener implements Runnable, Service {
         running = true;
         while (running) {
             try {
-                EthernetPacket packet = Optional
-                    .ofNullable(handle.getNextPacketEx())
-                    .map(p -> p.get(EthernetPacket.class))
-                    .orElseThrow(() -> new Exception("received an invalid frame"));
+                EthernetPacket packet =
+                        Optional.ofNullable(handle.getNextPacketEx())
+                                .map(p -> p.get(EthernetPacket.class))
+                                .orElseThrow(() -> new Exception("received an invalid frame"));
 
                 RequestContext ctx = new RequestContext(packet, sender, ifaceAddr);
                 if (packet.getHeader().getSrcAddr().equals(ifaceAddr)
-                    && ctx.getAoeFrame().getHeader().getResponseFlag())
-                {
+                        && ctx.getAoeFrame().getHeader().getResponseFlag()) {
                     // Special case where target runs on the same machine as the client.
                     continue;
                 } else {
@@ -116,10 +116,8 @@ public class InterfaceListener implements Runnable, Service {
                 }
 
                 processorRegistry
-                    .lookup(ctx)
-                    .ifPresent(
-                        matched -> matched.forEach(
-                            processor -> processor.enqueue(ctx)));
+                        .lookup(ctx)
+                        .ifPresent(matched -> matched.forEach(processor -> processor.enqueue(ctx)));
             } catch (TimeoutException e) {
                 // Nothing received, carry on.
             } catch (EOFException e) {
@@ -133,16 +131,16 @@ public class InterfaceListener implements Runnable, Service {
 
     private static MacAddress fetchIfaceHardwareAddress(Interface iface) throws Exception {
         if (iface.getHwAddr() != null) {
-            LOG.info("over-riding iface {} hardware address to {}",
-                     iface.getName(), iface.getHwAddr());
-            return MacAddress.getByName(
-                iface.getHwAddr());
+            LOG.info(
+                    "over-riding iface {} hardware address to {}",
+                    iface.getName(),
+                    iface.getHwAddr());
+            return MacAddress.getByName(iface.getHwAddr());
         }
 
         NetworkInterface ifaceDevice = NetworkInterface.getByName(iface.getName());
         if (ifaceDevice == null)
-            throw new Exception(
-                "iface " + iface.getName() + " is not useable (may not exist)");
+            throw new Exception("iface " + iface.getName() + " is not useable (may not exist)");
 
         byte[] hwAddr = ifaceDevice.getHardwareAddress();
         if (hwAddr == null)

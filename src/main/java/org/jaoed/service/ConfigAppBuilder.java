@@ -2,7 +2,6 @@ package org.jaoed.service;
 
 import java.util.LinkedList;
 import java.util.List;
-
 import org.jaoed.config.*;
 import org.jaoed.net.*;
 import org.jaoed.packet.*;
@@ -33,45 +32,41 @@ public class ConfigAppBuilder implements AppBuilder {
 
     @Override
     public App build() throws Exception {
-        Config config = new ConfigBuilder()
-            .parseFile(configPath)
-            .build();
+        Config config = new ConfigBuilder().parseFile(configPath).build();
 
         // TODO: make configurable in global section.
         int outputQueueSize = 1000;
         int poolSize = 5;
         int senderPollMs = 1000;
-        PooledSender sender = new PooledSender(
-            outputQueueSize, senderPollMs, poolSize);
+        PooledSender sender = new PooledSender(outputQueueSize, senderPollMs, poolSize);
         services.add(sender);
 
         // TODO: make configurable per iface section.
         int ifacePollMs = 1000;
         TargetRegistry targetRegistry = new TargetRegistry();
         for (Interface iface : config.getInterfaces()) {
-            services.add(
-                new InterfaceListener(iface, targetRegistry, ifacePollMs));
+            services.add(new InterfaceListener(iface, targetRegistry, ifacePollMs));
         }
 
         // TODO: add more commands here.
-        CommandFactory commandDispatcher = CommandDispatcher
-            .newBuilder()
-            .addCommandFactory(AoeCommand.QUERY_CONFIG, new QueryConfigCommand())
-            .build();
+        CommandFactory commandDispatcher =
+                CommandDispatcher.newBuilder()
+                        .addCommandFactory(AoeCommand.QUERY_CONFIG, new QueryConfigCommand())
+                        .build();
 
         // TODO: make configurable per device section.
         int targetPollMs = 1000;
         int inputQueueSize = 1000;
         for (Device device : config.getDevices()) {
-            DeviceTarget target = DeviceTarget
-                .newBuilder()
-                .setDeviceConfig(device)
-                .setResponseProcessor(sender)
-                .setPollInterval(targetPollMs)
-                .setInputQueueSize(inputQueueSize)
-                .setCommandFactory(commandDispatcher)
-                .setConfigArea(new DeviceConfigArea())
-                .build();
+            DeviceTarget target =
+                    DeviceTarget.newBuilder()
+                            .setDeviceConfig(device)
+                            .setResponseProcessor(sender)
+                            .setPollInterval(targetPollMs)
+                            .setInputQueueSize(inputQueueSize)
+                            .setCommandFactory(commandDispatcher)
+                            .setConfigArea(new DeviceConfigArea())
+                            .build();
             targetRegistry.addTarget(target);
             services.add(target);
         }

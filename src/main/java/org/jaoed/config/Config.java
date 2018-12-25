@@ -1,13 +1,12 @@
 package org.jaoed.config;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.Collection;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.lang.Iterable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class Config implements Iterable<Section> {
     private List<Device> devices;
@@ -55,8 +54,7 @@ public class Config implements Iterable<Section> {
     }
 
     public void validate(Validator validator) throws ValidationException {
-        for (Section section : this)
-            section.acceptVisitor(validator);
+        for (Section section : this) section.acceptVisitor(validator);
         validator.validate();
     }
 
@@ -64,16 +62,12 @@ public class Config implements Iterable<Section> {
     public Iterator<Section> iterator() {
         List<Section> sections = new LinkedList<>();
 
-        for (Logger logger : loggers.values())
-            sections.add(logger);
-        for (Acl acl : acls.values())
-            sections.add(acl);
-        for (Interface iface : interfaces.values())
-            sections.add(iface);
+        for (Logger logger : loggers.values()) sections.add(logger);
+        for (Acl acl : acls.values()) sections.add(acl);
+        for (Interface iface : interfaces.values()) sections.add(iface);
         for (Device device : devices) {
             sections.add(device);
-            if (device.getAcls() != null)
-                sections.add(device.getAcls());
+            if (device.getAcls() != null) sections.add(device.getAcls());
         }
 
         return sections.iterator();
@@ -82,14 +76,10 @@ public class Config implements Iterable<Section> {
     @Override
     public String toString() {
         String out = "Config:\n";
-        if (loggers.size() > 0)
-            out += loggers + "\n";
-        if (acls.size() > 0)
-            out += acls + "\n";
-        if (interfaces.size() > 0)
-            out += interfaces + "\n";
-        if (devices.size() > 0)
-            out += devices;
+        if (loggers.size() > 0) out += loggers + "\n";
+        if (acls.size() > 0) out += acls + "\n";
+        if (interfaces.size() > 0) out += interfaces + "\n";
+        if (devices.size() > 0) out += devices;
         return out;
     }
 }

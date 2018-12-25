@@ -1,17 +1,12 @@
 package org.jaoed.target;
 
-import java.util.Optional;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.pcap4j.packet.EthernetPacket;
-
+import java.util.Optional;
+import org.jaoed.net.RequestContext;
+import org.jaoed.packet.namednumber.AoeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.jaoed.net.RequestContext;
-import org.jaoed.packet.AoeFrame;
-import org.jaoed.packet.namednumber.AoeCommand;
 
 public class CommandDispatcher implements CommandFactory {
     private static final Logger LOG = LoggerFactory.getLogger(CommandDispatcher.class);
@@ -35,9 +30,7 @@ public class CommandDispatcher implements CommandFactory {
             return Optional.empty();
         }
 
-        return commandFactories
-            .get(command)
-            .makeCommand(ctx);
+        return commandFactories.get(command).makeCommand(ctx);
     }
 
     public static class Builder {

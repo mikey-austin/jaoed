@@ -1,14 +1,14 @@
 package org.jaoed.config;
 
-import java.nio.file.Path;
-import java.nio.file.Files;
+import static org.jaoed.target.TargetUtils.*;
+
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static org.jaoed.target.TargetUtils.*;
 
 public class Validator implements ConfigVisitor {
     private Map<String, Device> targets;
@@ -22,15 +22,13 @@ public class Validator implements ConfigVisitor {
 
     public void validate() throws ValidationException {
         // Throw the last saved exception.
-        if (exception != null)
-            throw exception;
+        if (exception != null) throw exception;
     }
 
     public void validateDevice(Device device) throws ValidationException {
         String target = device.getTarget();
 
-        if (target == null)
-            throw new ValidationException("Device target required");
+        if (target == null) throw new ValidationException("Device target required");
 
         if (device.getSlot() < 0 || device.getShelf() < 0)
             throw new ValidationException("Device slot/shelf must be >= 0");
@@ -62,9 +60,9 @@ public class Validator implements ConfigVisitor {
 
         // Every target needs to be unique.
         if (targets.containsKey(device.getTarget())) {
-            exception = new ValidationException(
-                "Target " + device.getTarget()
-                + " has already been specified");
+            exception =
+                    new ValidationException(
+                            "Target " + device.getTarget() + " has already been specified");
         } else {
             targets.put(device.getTarget(), device);
         }
@@ -74,10 +72,15 @@ public class Validator implements ConfigVisitor {
         int slot = device.getSlot();
         long shelfSlot = combineMajorMinor(shelf, slot);
         if (targetShelfSlots.contains(shelfSlot)) {
-            exception = new ValidationException(
-                "Shelf " + Integer.toString(shelf) + " and slot "
-                + Integer.toString(slot) + " for target "
-                + device.getTarget() + " has already been specified");
+            exception =
+                    new ValidationException(
+                            "Shelf "
+                                    + Integer.toString(shelf)
+                                    + " and slot "
+                                    + Integer.toString(slot)
+                                    + " for target "
+                                    + device.getTarget()
+                                    + " has already been specified");
         } else {
             targetShelfSlots.add(shelfSlot);
         }
@@ -86,8 +89,7 @@ public class Validator implements ConfigVisitor {
     @Override
     public void visitInterface(Interface iface) {
         try {
-            if (iface.getName() == null)
-                throw new ValidationException("Interface name required");
+            if (iface.getName() == null) throw new ValidationException("Interface name required");
         } catch (ValidationException e) {
             exception = e;
         }
@@ -96,8 +98,7 @@ public class Validator implements ConfigVisitor {
     @Override
     public void visitLogger(Logger logger) {
         try {
-            if (logger.getName() == null)
-                throw new ValidationException("Logger name required");
+            if (logger.getName() == null) throw new ValidationException("Logger name required");
         } catch (ValidationException e) {
             exception = e;
         }
@@ -106,8 +107,7 @@ public class Validator implements ConfigVisitor {
     @Override
     public void visitAcl(Acl acl) {
         try {
-            if (acl.getName() == null)
-                throw new ValidationException("Acl name required");
+            if (acl.getName() == null) throw new ValidationException("Acl name required");
         } catch (ValidationException e) {
             exception = e;
         }

@@ -1,12 +1,9 @@
 package org.jaoed.config;
 
-import java.util.Stack;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.lang.StringBuilder;
 import java.io.IOException;
-
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import main.antlr4.org.jaoed.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
@@ -49,8 +46,7 @@ public class ConfigBuilder extends ConfigBaseListener {
         return this;
     }
 
-    public void parseInputStream(CharStream stream)
-        throws IOException {
+    public void parseInputStream(CharStream stream) throws IOException {
 
         ConfigLexer lexer = new ConfigLexer(stream);
         TokenStream tokenStream = new CommonTokenStream(lexer);
@@ -65,9 +61,10 @@ public class ConfigBuilder extends ConfigBaseListener {
     @Override
     public void exitLoggerType(ConfigParser.LoggerTypeContext ctx) {
         String type = ctx.getChild(2).getText();
-        Logger logger = type.equals("syslog")
-            ? new org.jaoed.config.logger.Syslog()
-            : new org.jaoed.config.logger.File();
+        Logger logger =
+                type.equals("syslog")
+                        ? new org.jaoed.config.logger.Syslog()
+                        : new org.jaoed.config.logger.File();
 
         // Record the above instantiated subclass, which will be fleshened
         // on the call to the exitLoggerSection hook.
@@ -107,9 +104,7 @@ public class ConfigBuilder extends ConfigBaseListener {
         for (ConfigParser.AclAssignmentContext assignment : statements.aclAssignment()) {
             if (assignment instanceof ConfigParser.AclPolicyContext) {
                 String policy = assignment.getChild(2).getText();
-                acl.setPolicy(policy.equals("accept")
-                    ? Acl.Policy.ACCEPT
-                    : Acl.Policy.REJECT);
+                acl.setPolicy(policy.equals("accept") ? Acl.Policy.ACCEPT : Acl.Policy.REJECT);
             } else if (assignment instanceof ConfigParser.AclAcceptContext) {
                 for (String host : getListStrings(assignment.getChild(2))) {
                     acl.addAcceptedHost(host);
@@ -120,8 +115,7 @@ public class ConfigBuilder extends ConfigBaseListener {
                 }
             } else if (assignment instanceof ConfigParser.AclLoggerContext) {
                 Logger logger = loggerTab.get(assignment.getChild(2).getText());
-                if (logger != null)
-                    acl.setLogger(logger);
+                if (logger != null) acl.setLogger(logger);
             } else if (assignment instanceof ConfigParser.AclLogLevelContext) {
                 String level = assignment.getChild(2).getText();
                 acl.setLogLevel(Logger.makeLevel(level));
@@ -138,13 +132,13 @@ public class ConfigBuilder extends ConfigBaseListener {
         iface.setName(ctx.getChild(1).getText());
 
         ConfigParser.InterfaceStatementsContext statements = ctx.interfaceStatements();
-        for (ConfigParser.InterfaceAssignmentContext assignment : statements.interfaceAssignment()) {
+        for (ConfigParser.InterfaceAssignmentContext assignment :
+                statements.interfaceAssignment()) {
             if (assignment instanceof ConfigParser.InterfaceHwAddrContext) {
                 iface.setHwAddr(assignment.getChild(2).getText());
             } else if (assignment instanceof ConfigParser.InterfaceLoggerContext) {
                 Logger logger = loggerTab.get(assignment.getChild(2).getText());
-                if (logger != null)
-                    iface.setLogger(logger);
+                if (logger != null) iface.setLogger(logger);
             } else if (assignment instanceof ConfigParser.InterfaceLogLevelContext) {
                 String level = assignment.getChild(2).getText();
                 iface.setLogLevel(Logger.makeLevel(level));
@@ -159,23 +153,20 @@ public class ConfigBuilder extends ConfigBaseListener {
     public void exitDeviceAclSection(ConfigParser.DeviceAclSectionContext ctx) {
         Device.DeviceAcl acls = new Device.DeviceAcl();
         ConfigParser.DeviceAclStatementsContext statements = ctx.deviceAclStatements();
-        for (ConfigParser.DeviceAclAssignmentContext assignment : statements.deviceAclAssignment()) {
+        for (ConfigParser.DeviceAclAssignmentContext assignment :
+                statements.deviceAclAssignment()) {
             if (assignment instanceof ConfigParser.DeviceAclCfgReadContext) {
                 Acl acl = aclTab.get(assignment.getChild(2).getText());
-                if (acl != null)
-                    acls.setCfgRead(acl);
+                if (acl != null) acls.setCfgRead(acl);
             } else if (assignment instanceof ConfigParser.DeviceAclCfgSetContext) {
                 Acl acl = aclTab.get(assignment.getChild(2).getText());
-                if (acl != null)
-                    acls.setCfgSet(acl);
+                if (acl != null) acls.setCfgSet(acl);
             } else if (assignment instanceof ConfigParser.DeviceAclReadContext) {
                 Acl acl = aclTab.get(assignment.getChild(2).getText());
-                if (acl != null)
-                    acls.setRead(acl);
+                if (acl != null) acls.setRead(acl);
             } else if (assignment instanceof ConfigParser.DeviceAclWriteContext) {
                 Acl acl = aclTab.get(assignment.getChild(2).getText());
-                if (acl != null)
-                    acls.setWrite(acl);
+                if (acl != null) acls.setWrite(acl);
             }
         }
 
@@ -204,12 +195,10 @@ public class ConfigBuilder extends ConfigBaseListener {
                 device.setBroadcast(broadcast.equals("true") ? true : false);
             } else if (assignment instanceof ConfigParser.DeviceInterfaceContext) {
                 Interface iface = ifaceTab.get(assignment.getChild(2).getText());
-                if (iface != null)
-                    device.setInterface(iface);
+                if (iface != null) device.setInterface(iface);
             } else if (assignment instanceof ConfigParser.DeviceLoggerContext) {
                 Logger logger = loggerTab.get(assignment.getChild(2).getText());
-                if (logger != null)
-                    device.setLogger(logger);
+                if (logger != null) device.setLogger(logger);
             } else if (assignment instanceof ConfigParser.DeviceLogLevelContext) {
                 String level = assignment.getChild(2).getText();
                 device.setLogLevel(Logger.makeLevel(level));
@@ -231,9 +220,7 @@ public class ConfigBuilder extends ConfigBaseListener {
         if (listCtx.listStatements() != null) {
             for (ConfigParser.ListEntryContext entry : listCtx.listStatements().listEntry()) {
                 if (entry instanceof ConfigParser.StrEntryContext) {
-                    strings.add(
-                        unquote(((ConfigParser.StrEntryContext) entry)
-                                .STRING().getText()));
+                    strings.add(unquote(((ConfigParser.StrEntryContext) entry).STRING().getText()));
                 }
             }
         }

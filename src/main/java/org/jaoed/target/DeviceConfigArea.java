@@ -1,8 +1,8 @@
 package org.jaoed.target;
 
-import java.util.Arrays;
 import static java.lang.Math.min;
 
+import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +17,7 @@ public class DeviceConfigArea implements ConfigArea {
 
     @Override
     public void setConfig(byte[] bytes, int length) {
-        int lengthToCopy = min(
-            min(length, ConfigArea.MAX_LENGTH), bytes.length);
+        int lengthToCopy = min(min(length, ConfigArea.MAX_LENGTH), bytes.length);
         if (lengthToCopy < length) {
             LOG.warn("truncating config string to {} bytes", lengthToCopy);
         }
@@ -51,7 +50,8 @@ public class DeviceConfigArea implements ConfigArea {
         int prefixLength = min(prefix.length, length);
         if (isCompleteMatch(prefix, length)) {
             return true;
-        } if (isEmpty() || config.length < prefixLength) {
+        }
+        if (isEmpty() || config.length < prefixLength) {
             return false;
         }
 

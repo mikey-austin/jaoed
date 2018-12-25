@@ -1,7 +1,7 @@
 package org.jaoed.config;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Acl implements Section {
     private String name;
@@ -77,13 +77,21 @@ public class Acl implements Section {
 
     @Override
     public String toString() {
-        String out = "Acl<" + name + ">:\n"
-            + " -> policy = " + policy + "\n"
-            + " -> accept = " + acceptedHosts + "\n"
-            + " -> reject = " + rejectedHosts + "\n";
+        String out =
+                "Acl<"
+                        + name
+                        + ">:\n"
+                        + " -> policy = "
+                        + policy
+                        + "\n"
+                        + " -> accept = "
+                        + acceptedHosts
+                        + "\n"
+                        + " -> reject = "
+                        + rejectedHosts
+                        + "\n";
         if (logger != null) {
-            out += " -> logger = " + logger.getName() + "\n"
-                + " -> log-level = " + logLevel + "\n";
+            out += " -> logger = " + logger.getName() + "\n" + " -> log-level = " + logLevel + "\n";
         }
 
         return out;

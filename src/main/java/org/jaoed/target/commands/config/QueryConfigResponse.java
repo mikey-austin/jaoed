@@ -1,15 +1,6 @@
 package org.jaoed.target.commands.config;
 
 import java.util.Arrays;
-
-import org.pcap4j.packet.EthernetPacket;
-import org.pcap4j.packet.Packet;
-import org.pcap4j.packet.UnknownPacket;
-import org.pcap4j.util.MacAddress;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.jaoed.net.AoeVersion;
 import org.jaoed.net.RequestContext;
 import org.jaoed.packet.AoeFrame;
@@ -17,8 +8,12 @@ import org.jaoed.packet.QueryConfigPayload;
 import org.jaoed.packet.namednumber.AoeError;
 import org.jaoed.target.ConfigArea;
 import org.jaoed.target.DeviceTarget;
-import org.jaoed.target.TargetCommand;
 import org.jaoed.target.TargetResponse;
+import org.pcap4j.packet.EthernetPacket;
+import org.pcap4j.packet.Packet;
+import org.pcap4j.packet.UnknownPacket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryConfigResponse implements TargetResponse {
     private static final Logger LOG = LoggerFactory.getLogger(QueryConfigResponse.class);
@@ -55,43 +50,39 @@ public class QueryConfigResponse implements TargetResponse {
 
     public Packet makeResponse() {
         try {
-            QueryConfigPayload.Builder config = new QueryConfigPayload.Builder()
-                .firmwareVersion(target.getFirmwareVersion())
-                .sectorCount(target.getSectorCount())
-                .bufferCount(target.getBufferCount())
-                .aoeProtocolVersion(AoeVersion.SUPPORTED);
+            QueryConfigPayload.Builder config =
+                    new QueryConfigPayload.Builder()
+                            .firmwareVersion(target.getFirmwareVersion())
+                            .sectorCount(target.getSectorCount())
+                            .bufferCount(target.getBufferCount())
+                            .aoeProtocolVersion(AoeVersion.SUPPORTED);
             config.configStringLength((short) payload.length)
-                .payloadBuilder(
-                    new UnknownPacket.Builder().rawData(
-                        Arrays.copyOf(payload, ConfigArea.MAX_LENGTH)));
+                    .payloadBuilder(
+                            new UnknownPacket.Builder()
+                                    .rawData(Arrays.copyOf(payload, ConfigArea.MAX_LENGTH)));
 
             if (ctx.getAoeFrame().getPayload() != null) {
-                QueryConfigPayload requestConfig = QueryConfigPayload.newPacket(
-                    ctx.getAoeFrame().getPayload());
-                config.subCommand(
-                   requestConfig.getHeader().getSubCommand());
+                QueryConfigPayload requestConfig =
+                        QueryConfigPayload.newPacket(ctx.getAoeFrame().getPayload());
+                config.subCommand(requestConfig.getHeader().getSubCommand());
             }
 
-            AoeFrame.Builder aoe = ctx
-                .getAoeFrame()
-                .getBuilder()
-                .responseFlag(true)
-                .majorNumber(target.getDevice().getShelf())
-                .minorNumber(target.getDevice().getSlot())
-                .payloadBuilder(config);
+            AoeFrame.Builder aoe =
+                    ctx.getAoeFrame()
+                            .getBuilder()
+                            .responseFlag(true)
+                            .majorNumber(target.getDevice().getShelf())
+                            .minorNumber(target.getDevice().getSlot())
+                            .payloadBuilder(config);
             if (error != null) {
                 aoe.responseErrorFlag(true);
                 aoe.error(error);
             }
 
-            EthernetPacket.Builder eth = ctx
-                .getEthernetFrame()
-                .getBuilder()
-                .payloadBuilder(aoe);
+            EthernetPacket.Builder eth = ctx.getEthernetFrame().getBuilder().payloadBuilder(aoe);
 
             // Reverse ethernet request addresses.
-            eth.dstAddr(
-                ctx.getEthernetFrame().getHeader().getSrcAddr());
+            eth.dstAddr(ctx.getEthernetFrame().getHeader().getSrcAddr());
 
             // Always stamp the incoming interface's hardware address.
             eth.srcAddr(ctx.getIfaceAddr());

@@ -1,20 +1,14 @@
 package org.jaoed.target;
 
-import java.lang.Runnable;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import org.pcap4j.packet.EthernetPacket;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.jaoed.config.Device;
 import org.jaoed.net.RequestContext;
-import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.PacketProcessor;
 import org.jaoed.service.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeviceTarget implements PacketProcessor, Runnable, Service {
     private static final Logger LOG = LoggerFactory.getLogger(DeviceTarget.class);
@@ -53,8 +47,11 @@ public class DeviceTarget implements PacketProcessor, Runnable, Service {
 
     @Override
     public void run() {
-        LOG.info("starting target {} thread [queue = {}; poll = {}ms]",
-                 deviceConfig.getTarget(), inputQueueSize, pollInterval);
+        LOG.info(
+                "starting target {} thread [queue = {}; poll = {}ms]",
+                deviceConfig.getTarget(),
+                inputQueueSize,
+                pollInterval);
 
         this.running = true;
         while (running) {
@@ -103,10 +100,7 @@ public class DeviceTarget implements PacketProcessor, Runnable, Service {
 
     @Override
     public boolean enqueue(RequestContext ctx) {
-        return commandFactory
-            .makeCommand(ctx)
-            .map(inputQueue::offer)
-            .orElse(false);
+        return commandFactory.makeCommand(ctx).map(inputQueue::offer).orElse(false);
     }
 
     public ConfigArea getConfigArea() {

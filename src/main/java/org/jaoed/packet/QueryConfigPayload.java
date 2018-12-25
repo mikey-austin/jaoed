@@ -1,18 +1,16 @@
 package org.jaoed.packet;
 
+import static org.pcap4j.util.ByteArrays.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+import org.jaoed.packet.namednumber.*;
 import org.pcap4j.packet.AbstractPacket;
 import org.pcap4j.packet.IllegalRawDataException;
 import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.UnknownPacket;
 import org.pcap4j.util.ByteArrays;
-import org.pcap4j.util.MacAddress;
-import static org.pcap4j.util.ByteArrays.*;
-
-import org.jaoed.packet.namednumber.*;
 
 public final class QueryConfigPayload extends AbstractPacket {
     private final Header header;
@@ -24,14 +22,14 @@ public final class QueryConfigPayload extends AbstractPacket {
     }
 
     public static QueryConfigPayload newPacket(byte[] rawData, int offset, int length)
-        throws IllegalRawDataException {
+            throws IllegalRawDataException {
 
         ByteArrays.validateBounds(rawData, offset, length);
         return new QueryConfigPayload(rawData, offset, length);
     }
 
     private QueryConfigPayload(byte[] rawData, int offset, int length)
-        throws IllegalRawDataException {
+            throws IllegalRawDataException {
 
         this.header = new Header(rawData, offset, length);
 
@@ -42,9 +40,12 @@ public final class QueryConfigPayload extends AbstractPacket {
         if (payloadLength < 0) {
             throw new IllegalRawDataException("invalid payload length");
         } else if (payloadLength > 0) {
-            this.payload = new UnknownPacket.Builder()
-                .rawData(Arrays.copyOfRange(rawData, payloadOffset, payloadOffset + payloadLength))
-                .build();
+            this.payload =
+                    new UnknownPacket.Builder()
+                            .rawData(
+                                    Arrays.copyOfRange(
+                                            rawData, payloadOffset, payloadOffset + payloadLength))
+                            .build();
         } else {
             this.payload = null;
         }
@@ -52,9 +53,7 @@ public final class QueryConfigPayload extends AbstractPacket {
 
     private QueryConfigPayload(Builder builder) {
         this.header = new Header(builder);
-        this.payload = builder.payloadBuilder != null
-            ? builder.payloadBuilder.build()
-            : null;
+        this.payload = builder.payloadBuilder != null ? builder.payloadBuilder.build() : null;
     }
 
     @Override
@@ -90,11 +89,9 @@ public final class QueryConfigPayload extends AbstractPacket {
             this.sectorCount = header.sectorCount;
             this.aoeProtocolVersion = header.aoeProtocolVersion;
             this.configStringLength = header.configStringLength;
-            QueryConfigSubCommand
-                .getInstance(header.subCommand.value())
-                .ifPresent(command -> this.subCommand = command);
-            if (packet.payload != null)
-                this.payloadBuilder = packet.payload.getBuilder();
+            QueryConfigSubCommand.getInstance(header.subCommand.value())
+                    .ifPresent(command -> this.subCommand = command);
+            if (packet.payload != null) this.payloadBuilder = packet.payload.getBuilder();
         }
 
         public Builder bufferCount(short bufferCount) {
@@ -158,7 +155,8 @@ public final class QueryConfigPayload extends AbstractPacket {
         private static final int FIRMWARE_VERSION_OFFSET = BUFFER_COUNT_OFFSET + BUFFER_COUNT_SIZE;
         private static final int FIRMWARE_VERSION_SIZE = 2;
 
-        private static final int SECTOR_COUNT_OFFSET = FIRMWARE_VERSION_OFFSET + FIRMWARE_VERSION_SIZE;
+        private static final int SECTOR_COUNT_OFFSET =
+                FIRMWARE_VERSION_OFFSET + FIRMWARE_VERSION_SIZE;
         private static final int SECTOR_COUNT_SIZE = 1;
 
         private static final int AOE_CMD_OFFSET = SECTOR_COUNT_OFFSET + SECTOR_COUNT_SIZE;
@@ -178,13 +176,13 @@ public final class QueryConfigPayload extends AbstractPacket {
             if (length < QUERY_CONFIG_SIZE) {
                 StringBuilder sb = new StringBuilder(200);
                 sb.append("The data is too short to build a QueryConfigPayload header (")
-                    .append(QUERY_CONFIG_SIZE)
-                    .append(" bytes). data: ")
-                    .append(ByteArrays.toHexString(rawData, " "))
-                    .append(", offset: ")
-                    .append(offset)
-                    .append(", length: ")
-                    .append(length);
+                        .append(QUERY_CONFIG_SIZE)
+                        .append(" bytes). data: ")
+                        .append(ByteArrays.toHexString(rawData, " "))
+                        .append(", offset: ")
+                        .append(offset)
+                        .append(", length: ")
+                        .append(length);
                 throw new IllegalRawDataException(sb.toString());
             }
 
@@ -194,9 +192,8 @@ public final class QueryConfigPayload extends AbstractPacket {
 
             byte aoeCmdByte = ByteArrays.getByte(rawData, AOE_CMD_OFFSET + offset);
             this.aoeProtocolVersion = (byte) ((aoeCmdByte & 0xF0) >>> 4);
-            QueryConfigSubCommand
-                .getInstance((byte) (aoeCmdByte & 0x0F))
-                .ifPresent(command -> this.subCommand = command);
+            QueryConfigSubCommand.getInstance((byte) (aoeCmdByte & 0x0F))
+                    .ifPresent(command -> this.subCommand = command);
 
             this.configStringLength = ByteArrays.getShort(rawData, CONFIG_STR_LEN_OFFSET + offset);
         }
@@ -259,47 +256,29 @@ public final class QueryConfigPayload extends AbstractPacket {
             StringBuilder sb = new StringBuilder();
             String ls = System.getProperty("line.separator");
 
-            sb.append("[AoE/QueryConfigPayload (")
-                .append(length())
-                .append(" bytes)]")
-                .append(ls);
-            sb.append("  Buffer count: ")
-                .append(bufferCount)
-                .append(ls);
-            sb.append("  Firmware version: ")
-                .append(firmwareVersion)
-                .append(ls);
-            sb.append("  Sector count: ")
-                .append(sectorCount)
-                .append(ls);
-            sb.append("  AoE protocol version: ")
-                .append(aoeProtocolVersion)
-                .append(ls);
-            sb.append("  Sub-command: ")
-                .append(subCommand.name())
-                .append(ls);
-            sb.append("  Config string length: ")
-                .append(configStringLength)
-                .append(ls);
+            sb.append("[AoE/QueryConfigPayload (").append(length()).append(" bytes)]").append(ls);
+            sb.append("  Buffer count: ").append(bufferCount).append(ls);
+            sb.append("  Firmware version: ").append(firmwareVersion).append(ls);
+            sb.append("  Sector count: ").append(sectorCount).append(ls);
+            sb.append("  AoE protocol version: ").append(aoeProtocolVersion).append(ls);
+            sb.append("  Sub-command: ").append(subCommand.name()).append(ls);
+            sb.append("  Config string length: ").append(configStringLength).append(ls);
 
             return sb.toString();
         }
 
         @Override
         public boolean equals(Object obj) {
-            if (obj == this)
-                return true;
-            if (!this.getClass().isInstance(obj))
-                return false;
+            if (obj == this) return true;
+            if (!this.getClass().isInstance(obj)) return false;
 
             Header other = (Header) obj;
-            return
-                bufferCount == other.bufferCount
-                && firmwareVersion == other.firmwareVersion
-                && sectorCount == other.sectorCount
-                && aoeProtocolVersion == other.aoeProtocolVersion
-                && configStringLength == other.configStringLength
-                && subCommand.equals(other.subCommand);
+            return bufferCount == other.bufferCount
+                    && firmwareVersion == other.firmwareVersion
+                    && sectorCount == other.sectorCount
+                    && aoeProtocolVersion == other.aoeProtocolVersion
+                    && configStringLength == other.configStringLength
+                    && subCommand.equals(other.subCommand);
         }
 
         @Override

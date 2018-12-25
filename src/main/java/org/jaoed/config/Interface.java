@@ -54,8 +54,7 @@ public class Interface implements Section {
             out += " -> hwaddr = " + hwAddr + "\n";
         }
         if (logger != null) {
-            out += " -> logger = " + logger.getName() + "\n"
-                + " -> log-level = " + logLevel + "\n";
+            out += " -> logger = " + logger.getName() + "\n" + " -> log-level = " + logLevel + "\n";
         }
         return out;
     }

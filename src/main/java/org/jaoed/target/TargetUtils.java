@@ -1,7 +1,7 @@
 package org.jaoed.target;
 
-import static java.lang.Math.round;
 import static java.lang.Math.pow;
+import static java.lang.Math.round;
 
 public class TargetUtils {
     public static final int MAX_MAJOR_NUMBER = ((int) round(pow(2, 16))) - 1;
@@ -42,8 +42,7 @@ public class TargetUtils {
     }
 
     public static long combineMajorMinor(short major, byte minor) {
-        return combineMajorMinor(
-            decodeMajor(major), decodeMinor(minor));
+        return combineMajorMinor(decodeMajor(major), decodeMinor(minor));
     }
 
     public static long combineMajorMinor(int major, int minor) {

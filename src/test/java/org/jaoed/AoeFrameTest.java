@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.EOFException;
 import java.util.concurrent.TimeoutException;
-
 import org.jaoed.packet.AoeFrame;
 import org.jaoed.packet.namednumber.AoeCommand;
 import org.jaoed.packet.namednumber.AoeError;
@@ -26,12 +25,9 @@ public class AoeFrameTest {
 
     @Test
     public void testPcapReader()
-        throws PcapNativeException, NotOpenException, IllegalRawDataException {
+            throws PcapNativeException, NotOpenException, IllegalRawDataException {
 
-        String file = getClass()
-            .getClassLoader()
-            .getResource("sampleAoeFrame.pcap")
-            .getFile();
+        String file = getClass().getClassLoader().getResource("sampleAoeFrame.pcap").getFile();
         assertNotNull(file);
 
         PcapHandle handle = Pcaps.openOffline(file);
@@ -50,8 +46,7 @@ public class AoeFrameTest {
                 Packet payload = frame.getPayload();
                 assertNotNull(payload);
                 byte[] rawPayload = payload.getRawData();
-                AoeFrame aoeFrame = AoeFrame.newPacket(
-                    rawPayload, 0, rawPayload.length);
+                AoeFrame aoeFrame = AoeFrame.newPacket(rawPayload, 0, rawPayload.length);
                 assertNotNull(aoeFrame);
                 LOG.info("received aoe frame {}", aoeFrame);
 
@@ -79,13 +74,13 @@ public class AoeFrameTest {
         AoeFrame.Builder builder = new AoeFrame.Builder();
 
         builder.version((byte) 1)
-            .responseFlag(true)
-            .responseErrorFlag(true)
-            .error((byte) 1)
-            .majorNumber((short) 222)
-            .minorNumber((byte) 33)
-            .command((byte) 3)
-            .tag(new byte[] { 0x11, 0x22, 0x33, 0x44 });
+                .responseFlag(true)
+                .responseErrorFlag(true)
+                .error((byte) 1)
+                .majorNumber((short) 222)
+                .minorNumber((byte) 33)
+                .command((byte) 3)
+                .tag(new byte[] {0x11, 0x22, 0x33, 0x44});
 
         AoeFrame aoeFrame = builder.build();
         assertNotNull(aoeFrame);
