@@ -1,10 +1,9 @@
 package org.jaoed;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.jaoed.service.App;
 import org.jaoed.service.ConfigAppBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Jaoed {
     private static final Logger LOG = LoggerFactory.getLogger(Jaoed.class);

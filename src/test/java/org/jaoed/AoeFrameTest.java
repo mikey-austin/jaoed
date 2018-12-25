@@ -1,39 +1,30 @@
 package org.jaoed;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.EOFException;
 import java.util.concurrent.TimeoutException;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.pcap4j.util.ByteArrays;
+import org.jaoed.packet.AoeFrame;
+import org.jaoed.packet.namednumber.AoeCommand;
+import org.jaoed.packet.namednumber.AoeError;
+import org.junit.Test;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapHandle;
-import org.pcap4j.core.PcapHandle.TimestampPrecision;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.Pcaps;
-import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.IllegalRawDataException;
-
+import org.pcap4j.packet.Packet;
+import org.pcap4j.util.ByteArrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jaoed.packet.AoeFrame;
-import org.jaoed.packet.namednumber.*;
-
-public class AoeFrameTest extends TestCase {
+public class AoeFrameTest {
     private static final Logger LOG = LoggerFactory.getLogger(AoeFrameTest.class);
 
-    public AoeFrameTest(String testName) {
-        super(testName);
-    }
-
-    public static Test suite() {
-        return new TestSuite(AoeFrameTest.class);
-    }
-
+    @Test
     public void testPcapReader()
         throws PcapNativeException, NotOpenException, IllegalRawDataException {
 
@@ -83,8 +74,8 @@ public class AoeFrameTest extends TestCase {
         handle.close();
     }
 
+    @Test
     public void testAoeFrameBuilder() throws IllegalRawDataException {
-
         AoeFrame.Builder builder = new AoeFrame.Builder();
 
         builder.version((byte) 1)
