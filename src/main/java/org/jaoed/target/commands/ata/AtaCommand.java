@@ -73,7 +73,7 @@ public class AtaCommand implements CommandFactory {
             LOG.debug("ATA read requested for device {}", target);
             AtaResponse response = ataResponseFactory.apply(ctx, target);
 
-            // Perform actual read and populate response.
+            // TODO: Perform actual read and populate response.
 
             return Optional.of(response);
         };
